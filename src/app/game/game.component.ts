@@ -3,6 +3,8 @@ import Phaser from 'phaser';
 import { MainScene } from './scenes/main_scene';
 import Preloader from './scenes/preloader';
 
+import NineSlicePlugin from 'phaser3-nineslice'
+
 @Component({
   selector: 'app-game',
   templateUrl: './game.component.html',
@@ -16,17 +18,17 @@ export class GameComponent implements OnInit {
   constructor() {
     this.config = {
       type: Phaser.AUTO,
-      height: 600,
+      height: 640,
       width: 600,
       physics: {
         default: 'arcade',
         arcade: {
-          gravity: { y: 0 }
+          gravity: { y: 0 },
         }
       },
       scene: [ Preloader, MainScene ],
       scale: {
-        zoom: 1.5
+        zoom: 1.4
       }
     };
     

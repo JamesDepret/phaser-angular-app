@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "version": "0.6.7"
+  },
+  "savePath": "",
+  "images": [
+    {
+      "name": "bowie-standing-left1.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/character/bowie/bowie-standing-left1.png",
+      "folder": ""
+    },
+    {
+      "name": "bowie-standing-left2.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/character/bowie/bowie-standing-left2.png",
+      "folder": ""
+    },
+    {
+      "name": "bowie-standing-right1.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/character/bowie/bowie-standing-right1.png",
+      "folder": ""
+    },
+    {
+      "name": "bowie-standing-right2.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/character/bowie/bowie-standing-right2.png",
+      "folder": ""
+    },
+    {
+      "name": "bowie-standing-up1.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/character/bowie/bowie-standing-up1.png",
+      "folder": ""
+    },
+    {
+      "name": "bowie-standing-up2.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/character/bowie/bowie-standing-up2.png",
+      "folder": ""
+    },
+    {
+      "name": "bowie-standing1.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/character/bowie/bowie-standing1.png",
+      "folder": ""
+    },
+    {
+      "name": "bowie-standing2.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/character/bowie/bowie-standing2.png",
+      "folder": ""
+    }
+  ],
+  "folders": [],
+  "packOptions": {
+    "textureName": "bowie",
+    "textureFormat": "png",
+    "removeFileExtension": false,
+    "prependFolderName": true,
+    "base64Export": false,
+    "tinify": false,
+    "tinifyKey": "",
+    "scale": 1,
+    "filter": "none",
+    "exporter": "JSON (hash)",
+    "fileName": "pack-result",
+    "savePath": "",
+    "width": 2048,
+    "height": 2048,
+    "fixedSize": false,
+    "powerOfTwo": false,
+    "padding": 0,
+    "extrude": 0,
+    "allowRotation": true,
+    "allowTrim": true,
+    "trimMode": "trim",
+    "alphaThreshold": "0",
+    "detectIdentical": true,
+    "packer": "MaxRectsBin",
+    "packerMethod": "BestShortSideFit"
+  }
+}

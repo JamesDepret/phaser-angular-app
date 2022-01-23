@@ -1,67 +1,117 @@
 import Phaser from 'phaser';
+import { debugHelperDisplayWalls } from 'src/app/utils/debug';
+import CombatMenu from '../menu/combat_menu';
 
-enum Tile
-{
-	Grass = 125,
-	Grass2 = 96,
-	WallTopLeft = 61,
-	WallTopRight = 65,
-	WallTop = 63,
-	WallTop2 = 62,
-	WallRight = 123,
-	WallRight2 = 152,
-	WallRight3 = 94,
-	WallLeft = 119,
-	WallLeft2 = 148,
-	WallBody = 149,
-	WallBody2 = 351,
-	WallBody3 = 178,
-	WallBotLeft = 206,
-	WallBottom = 438,
-	WallBottom2 = 380,
-	WallBottom3 = 207,
-	WallBotRight = 210,
-}
-
-const TILE_SIZE = 32
-
-function tileToWorld(value: number)
-{
-	return (value * TILE_SIZE) + (TILE_SIZE * 0.5)
-}
-
-function worldToTile(value: number)
-{
-	return Math.floor(value / TILE_SIZE)
-}
-
-function alignToGrid(value: number)
-{
-	return tileToWorld(worldToTile(value))
-}
 export class MainScene extends Phaser.Scene {
+	private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+	private bowie!: Phaser.Physics.Arcade.Sprite;
+	private SPEED: number = 200;
+	private MenuOpened: boolean = false;
+	private combatMenu!: CombatMenu;
+
     constructor() {
       super({ key: 'game' });
     }
 
     create() {
+		this.cursors = this.input.keyboard.createCursorKeys();
         const map = this.make.tilemap({key: 'dungeon'});
         const tileset = map.addTilesetImage('dungeon', 'tiles');
 
         const groundLayer = map.createLayer('ground', tileset);
-        //map.createLayer('upper', tileset);
+        //map.createLayer('upper', tileset); // this is how you add additional layers on top of each other
         groundLayer.setCollisionByProperty({ collides: true });
+		//debugHelperDisplayWalls(groundLayer, this);
 
-        const debugGraphics = this.add.graphics().setAlpha(0.75);
-        groundLayer.renderDebug(debugGraphics, {
-            tileColor: null, // Color of non-colliding tiles
-            collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
-            faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
-        });
+		this.bowie = this.createCharacter('bowie', 240, 592);
+		this.physics.add.collider(this.bowie, groundLayer);
+
+		this.combatMenu = new CombatMenu(this);
     }
-
-
     
     override update() {
+		if(!this.cursors || !this.bowie) {
+			return;
+		}
+		this.setCursorValidation('bowie', this.bowie);
     }
+
+//#region PRIVATE FUNCTIONS
+	/**
+	 * 
+	 * @param charName Characters name, used in the animations as well
+	 * @param x x-location on map
+	 * @param y y-location on map
+	 * @returns animatable character with callable animations for: 
+	 * 
+	 * charname + 
+	 * - "-look-down", 
+	 * - "-look-left", 
+	 * - "-look-right", 
+	 * - "-look-up"
+	 */
+	private createCharacter(charName:string, x: number, y: number): Phaser.Physics.Arcade.Sprite {
+		const character = this.physics.add.sprite(x , y, charName, charName +'-standing1.png');
+		this.createCharAnimation(charName);
+		character.anims.play(charName + '-look-down');
+		return character;
+	}
+
+	private createCharAnimation(charName: string) {
+		createAnimation(this, charName + '-look-down', 	1,2, charName + '-standing');
+		createAnimation(this, charName + '-look-left',  1,2, charName + '-standing-left');
+		createAnimation(this, charName + '-look-right', 1,2, charName + '-standing-right');
+		createAnimation(this, charName + '-look-up', 	1,2, charName + '-standing-up');
+	}
+	
+	private lastMoveUpOrLeft: boolean = false;
+	private spaceDown: boolean = false;
+	private setCursorValidation(charName: string, charObj: Phaser.Physics.Arcade.Sprite){
+		if(this.cursors.space?.isDown && this.spaceDown == false){
+			this.spaceDown = true;
+			this.MenuOpened = !this.MenuOpened;
+			this.combatMenu.toggleMenu(this.MenuOpened);
+		} else if (this.cursors.space?.isUp && this.spaceDown) {
+			this.spaceDown = false;
+		}
+		if(!this.MenuOpened){
+			if(this.cursors.left?.isDown){
+				charObj.setVelocity(-this.SPEED,0);
+				this.lastMoveUpOrLeft = true;
+				charObj.anims.play(charName + '-look-left', true);
+			} 
+			else if (this.cursors.right?.isDown) {
+				charObj.setVelocity(this.SPEED, 0);
+				this.lastMoveUpOrLeft = false;
+				charObj.anims.play(charName + '-look-right', true);
+			} 
+			else if(this.cursors.down?.isDown){
+				charObj.setVelocity(0,this.SPEED);
+				this.lastMoveUpOrLeft = false;
+				charObj.anims.play(charName + '-look-down', true);
+			} 
+			else if (this.cursors.up?.isDown) {
+				charObj.setVelocity(0, -this.SPEED);
+				this.lastMoveUpOrLeft = true;
+				charObj.anims.play(charName + '-look-up', true);
+			} else {
+				charObj.setVelocity(0);
+				let xPosition = charObj.x;
+				let yPosition = charObj.y;
+				if((xPosition + 16) % 32 != 0) {
+					charObj.setX(this.lastMoveUpOrLeft ? this.round32(xPosition-24) + 16 : this.round32(xPosition+24) - 16);
+				}
+				
+				if((yPosition + 16) % 32 != 0) {
+					charObj.setY(this.lastMoveUpOrLeft ? this.round32(yPosition-24) + 16 : this.round32(yPosition+24) - 16);
+				}
+			}
+		}
+	}
+
+	round32(value: number): number{
+		return 32 * (Math.round(value / 32));
+	}
+
+//#endregion PRIVATE FUNCTIONS
 }
