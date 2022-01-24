@@ -75,7 +75,7 @@ export default class BaseMenu {
     }
 
     private addTextBox(name: string){
-        this.TEXTBOX.textBox(this.MENUPOSITION.width + 100, this.MENUPOSITION.height-24,160, 48, name);
+        this.TEXTBOX.textBox(this.MENUPOSITION.width + 100, this.MENUPOSITION.height-24,100, 48, name);
     }
 
     private StopAnimation(sprite: sprite){
