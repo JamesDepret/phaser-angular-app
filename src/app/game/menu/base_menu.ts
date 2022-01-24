@@ -24,6 +24,7 @@ export default class BaseMenu {
             this.createMenu(this.LEFT);
             this.createMenu(this.RIGHT);
             this.createMenu(this.DOWN);
+            
         }
         else {
             this.UP.spriteBody?.destroy();
@@ -66,7 +67,6 @@ export default class BaseMenu {
     }
 
     private StopAnimation(sprite: sprite){
-        
         sprite.spriteBody!.setFrame(0);
         sprite.spriteBody!.stop();
     }

@@ -6,6 +6,12 @@ import CombatMenu from '../menu/combat_menu';
 export class MainScene extends Phaser.Scene {
 	private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 	private bowie!: Phaser.Physics.Arcade.Sprite;
+	private gizmo1!: Phaser.Physics.Arcade.Sprite;
+	private gizmo2!: Phaser.Physics.Arcade.Sprite;
+	private gizmo3!: Phaser.Physics.Arcade.Sprite;
+	private gizmo4!: Phaser.Physics.Arcade.Sprite;
+	private gizmo5!: Phaser.Physics.Arcade.Sprite;
+	private gizmo6!: Phaser.Physics.Arcade.Sprite;
 	private SPEED: number = 200;
 	private MenuOpened: boolean = false;
 	private combatMenu!: CombatMenu;
@@ -25,6 +31,13 @@ export class MainScene extends Phaser.Scene {
 		//debugHelperDisplayWalls(groundLayer, this);
 
 		this.bowie = createCharacter(this, 'bowie', 240, 592);
+		
+		this.gizmo1 = createCharacter(this, 'gizmo', 240, 80);
+		this.gizmo2 = createCharacter(this, 'gizmo', 272, 80);
+		this.gizmo3 = createCharacter(this, 'gizmo', 304, 112);
+		this.gizmo4 = createCharacter(this, 'gizmo', 304, 144);
+		this.gizmo5 = createCharacter(this, 'gizmo', 208, 112);
+		this.gizmo6 = createCharacter(this, 'gizmo', 208, 144);
 		this.physics.add.collider(this.bowie, groundLayer);
 
 		this.combatMenu = new CombatMenu(this);
@@ -47,7 +60,8 @@ export class MainScene extends Phaser.Scene {
 		if(this.cursors.space?.isDown && this.spaceDown == false){
 			this.spaceDown = true;
 			this.MenuOpened = !this.MenuOpened;
-			this.combatMenu.toggleMenu(this.MenuOpened);
+			let EnemyNear = false; // TODO: set value based on range to enemy
+			this.combatMenu.toggleCombatMenu(this.MenuOpened, EnemyNear); 
 		} else if (this.cursors.space?.isUp && this.spaceDown) {
 			this.spaceDown = false;
 		}

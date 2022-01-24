@@ -11,6 +11,7 @@ export default class Preloader extends Phaser.Scene
         this.load.image('tiles','assets/tiles/stordarth-tiles.png');
         this.load.tilemapTiledJSON('dungeon', 'assets/tilemap/dungeon1.json');
         this.load.atlas('bowie','assets/character/bowie/bowie.png','assets/character/bowie/bowie.json');
+        this.load.atlas('gizmo','assets/enemies/gizmo/gizmo.png','assets/enemies/gizmo/gizmo.json');
 
         
         this.load.atlas('fight','assets/ui/fight.png','assets/ui/fight.json');
