@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { createCharacter } from 'src/app/utils/character';
 import { debugHelperDisplayWalls } from 'src/app/utils/debug';
 import CombatMenu from '../menu/combat_menu';
 
@@ -23,7 +24,7 @@ export class MainScene extends Phaser.Scene {
         groundLayer.setCollisionByProperty({ collides: true });
 		//debugHelperDisplayWalls(groundLayer, this);
 
-		this.bowie = this.createCharacter('bowie', 240, 592);
+		this.bowie = createCharacter(this, 'bowie', 240, 592);
 		this.physics.add.collider(this.bowie, groundLayer);
 
 		this.combatMenu = new CombatMenu(this);
@@ -37,41 +38,7 @@ export class MainScene extends Phaser.Scene {
     }
 
 //#region PRIVATE FUNCTIONS
-	/**
-	 * 
-	 * @param charName Characters name, used in the animations as well
-	 * @param x x-location on map
-	 * @param y y-location on map
-	 * @returns animatable character with callable animations for: 
-	 * 
-	 * charname + 
-	 * - "-look-down", 
-	 * - "-look-left", 
-	 * - "-look-right", 
-	 * - "-look-up"
-	 */
-	private createCharacter(charName:string, x: number, y: number): Phaser.Physics.Arcade.Sprite {
-		const character = this.physics.add.sprite(x , y, charName, charName +'-standing1.png');
-		this.createCharAnimation(charName);
-		character.anims.play(charName + '-look-down')
-		return character;
-	}
-
-	private createCharAnimation(charName: string) {
-		this.createAnimation(charName + '-look-down', 	charName + '-standing');
-		this.createAnimation(charName + '-look-left',  	charName + '-standing-left');
-		this.createAnimation(charName + '-look-right', 	charName + '-standing-right');
-		this.createAnimation(charName + '-look-up', 	charName + '-standing-up');
-	}
-
-	private createAnimation(name: string, pngName: string){
-		this.anims.create({
-			key: name,
-			frames: this.anims.generateFrameNames('bowie', { start: 1, end: 2, prefix: pngName, suffix:'.png'}),
-			repeat: -1,
-			frameRate: 4
-		});
-	}
+	
 
 	
 	private lastMoveUpOrLeft: boolean = false;
