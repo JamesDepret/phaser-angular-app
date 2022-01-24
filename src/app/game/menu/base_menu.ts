@@ -1,5 +1,6 @@
 import { createAnimation } from "src/app/utils/anim";
 import { sprite } from "./sprite/sprite";
+import TextBox from "./textbox";
 
 
 export default class BaseMenu {
@@ -8,6 +9,7 @@ export default class BaseMenu {
     protected UP: sprite = { name: 'fight', spriteBody: undefined, xPosition: 24, yPosition:-12 };
     protected DOWN: sprite = { name: 'stop', spriteBody: undefined, xPosition: 24, yPosition:12 };
     protected RIGHT: sprite = { name: 'items', spriteBody: undefined, xPosition: 48, yPosition:0 };
+    protected TEXTBOX: TextBox;
 
     protected scene!: Phaser.Scene;
 
@@ -16,6 +18,7 @@ export default class BaseMenu {
         let { width, height } = this.scene.sys.game.canvas;
         this.MENUPOSITION.width = width / 2 - 48;
         this.MENUPOSITION.height = height - 64;
+        this.TEXTBOX = new TextBox(scene);
     }
 
     public toggleMenu(condition: boolean){
@@ -31,6 +34,7 @@ export default class BaseMenu {
             this.LEFT.spriteBody?.destroy();
             this.RIGHT.spriteBody?.destroy();
             this.DOWN.spriteBody?.destroy();
+            this.TEXTBOX.removeTextbox();
         }
     }
 
@@ -56,14 +60,22 @@ export default class BaseMenu {
         this.StopAnimation(this.RIGHT);
 
         if(anim == this.UP.name){ 
+            this.addTextBox(this.UP.name);
             this.UP.spriteBody!.play(this.UP.name); 
         } else if(anim == this.LEFT.name){ 
+            this.addTextBox(this.LEFT.name);
             this.LEFT.spriteBody!.play(this.LEFT.name); 
         } else if(anim == this.DOWN.name){ 
+            this.addTextBox(this.DOWN.name);
             this.DOWN.spriteBody!.play(this.DOWN.name); 
         }  else if(anim == this.RIGHT.name){ 
+            this.addTextBox(this.RIGHT.name);
             this.RIGHT.spriteBody!.play(this.RIGHT.name); 
         }
+    }
+
+    private addTextBox(name: string){
+        this.TEXTBOX.textBox(this.MENUPOSITION.width + 100, this.MENUPOSITION.height-24,160, 48, name);
     }
 
     private StopAnimation(sprite: sprite){
@@ -75,4 +87,5 @@ export default class BaseMenu {
 		menu.spriteBody = this.scene.physics.add.sprite(menu.xPosition + this.MENUPOSITION.width , menu.yPosition + this.MENUPOSITION.height, menu.name, menu.name +'1.png');
 		createAnimation(this.scene,menu.name, '',1,2);
 	}
+
 }

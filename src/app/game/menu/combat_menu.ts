@@ -18,9 +18,9 @@ export default class CombatMenu extends BaseMenu {
     public toggleCombatMenu(condition: boolean, EnemyNear: boolean): void {
         super.toggleMenu(condition);
         if (condition && !EnemyNear) {
-            this.DOWN.spriteBody!.play(this.DOWN.name);
+            this.playAnimation(this.DOWN.name);
         } else if (condition) {
-            this.UP.spriteBody!.play(this.UP.name);
+            this.playAnimation(this.UP.name);
         }
     }
 }

@@ -15,6 +15,7 @@ const createCharacter = (scene: Phaser.Scene, charName:string, x: number, y: num
     const character = scene.physics.add.sprite(x , y, charName, charName +'-look-down1.png');
     createCharAnimation(scene,charName);
     character.anims.play(charName + '-look-down')
+    character.setImmovable(true);
     return character;
 };
 
