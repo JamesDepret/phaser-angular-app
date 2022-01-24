@@ -1,16 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import Phaser from 'phaser';
 import { MainScene } from './scenes/main_scene';
 import Preloader from './scenes/preloader';
-
-import NineSlicePlugin from 'phaser3-nineslice'
 
 @Component({
   selector: 'app-game',
   template: '',
   styles: ['']
 })
-export class GameComponent implements OnInit {
+export class GameComponent {
   //Game and frame size setup
 
   phaserGame: Phaser.Game;
@@ -35,7 +33,4 @@ export class GameComponent implements OnInit {
     
     this.phaserGame = new Phaser.Game(this.config);
   }
-  ngOnInit() {
-  }
-
 }
