@@ -53,16 +53,26 @@ export class MainScene extends Phaser.Scene {
 	private createCharacter(charName:string, x: number, y: number): Phaser.Physics.Arcade.Sprite {
 		const character = this.physics.add.sprite(x , y, charName, charName +'-standing1.png');
 		this.createCharAnimation(charName);
-		character.anims.play(charName + '-look-down');
+		character.anims.play(charName + '-look-down')
 		return character;
 	}
 
 	private createCharAnimation(charName: string) {
-		createAnimation(this, charName + '-look-down', 	1,2, charName + '-standing');
-		createAnimation(this, charName + '-look-left',  1,2, charName + '-standing-left');
-		createAnimation(this, charName + '-look-right', 1,2, charName + '-standing-right');
-		createAnimation(this, charName + '-look-up', 	1,2, charName + '-standing-up');
+		this.createAnimation(charName + '-look-down', 	charName + '-standing');
+		this.createAnimation(charName + '-look-left',  	charName + '-standing-left');
+		this.createAnimation(charName + '-look-right', 	charName + '-standing-right');
+		this.createAnimation(charName + '-look-up', 	charName + '-standing-up');
 	}
+
+	private createAnimation(name: string, pngName: string){
+		this.anims.create({
+			key: name,
+			frames: this.anims.generateFrameNames('bowie', { start: 1, end: 2, prefix: pngName, suffix:'.png'}),
+			repeat: -1,
+			frameRate: 4
+		});
+	}
+
 	
 	private lastMoveUpOrLeft: boolean = false;
 	private spaceDown: boolean = false;
@@ -74,7 +84,9 @@ export class MainScene extends Phaser.Scene {
 		} else if (this.cursors.space?.isUp && this.spaceDown) {
 			this.spaceDown = false;
 		}
-		if(!this.MenuOpened){
+		if(this.MenuOpened){
+			this.combatMenu.cursorInput(this.cursors);
+		} else {
 			if(this.cursors.left?.isDown){
 				charObj.setVelocity(-this.SPEED,0);
 				this.lastMoveUpOrLeft = true;
