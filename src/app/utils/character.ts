@@ -12,7 +12,7 @@
 	 * - "-look-up"
 	 */
 const createCharacter = (scene: Phaser.Scene, charName:string, x: number, y: number): Phaser.Physics.Arcade.Sprite =>{
-    const character = scene.physics.add.sprite(x , y, charName, charName +'-standing1.png');
+    const character = scene.physics.add.sprite(x , y, charName, charName +'-look-down1.png');
     createCharAnimation(scene,charName);
     character.anims.play(charName + '-look-down')
     return character;

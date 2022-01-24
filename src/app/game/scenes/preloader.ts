@@ -5,7 +5,7 @@ export default class Preloader extends Phaser.Scene
     constructor() {
         super('preloader');
     }
-
+    // image loader
     preload() 
     {
         this.load.image('tiles','assets/tiles/stordarth-tiles.png');

@@ -7,10 +7,11 @@ import NineSlicePlugin from 'phaser3-nineslice'
 
 @Component({
   selector: 'app-game',
-  templateUrl: './game.component.html',
-  styleUrls: ['./game.component.css']
+  template: '',
+  styles: ['']
 })
 export class GameComponent implements OnInit {
+  //Game and frame size setup
 
   phaserGame: Phaser.Game;
   config: Phaser.Types.Core.GameConfig;
