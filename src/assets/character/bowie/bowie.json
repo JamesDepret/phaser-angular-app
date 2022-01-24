@@ -1,6 +1,6 @@
 {
   "frames": {
-    "bowie-standing-right1.png": {
+    "bowie-look-down2.png": {
       "frame": {
         "x": 0,
         "y": 0,
@@ -24,7 +24,7 @@
         "y": 0.5
       }
     },
-    "bowie-standing-up1.png": {
+    "bowie-look-right1.png": {
       "frame": {
         "x": 33,
         "y": 0,
@@ -48,7 +48,7 @@
         "y": 0.5
       }
     },
-    "bowie-standing2.png": {
+    "bowie-look-up1.png": {
       "frame": {
         "x": 66,
         "y": 0,
@@ -72,7 +72,7 @@
         "y": 0.5
       }
     },
-    "bowie-standing-left1.png": {
+    "bowie-look-down1.png": {
       "frame": {
         "x": 99,
         "y": 0,
@@ -96,7 +96,7 @@
         "y": 0.5
       }
     },
-    "bowie-standing-left2.png": {
+    "bowie-look-left1.png": {
       "frame": {
         "x": 131,
         "y": 0,
@@ -120,7 +120,7 @@
         "y": 0.5
       }
     },
-    "bowie-standing-right2.png": {
+    "bowie-look-left2.png": {
       "frame": {
         "x": 163,
         "y": 0,
@@ -144,7 +144,7 @@
         "y": 0.5
       }
     },
-    "bowie-standing-up2.png": {
+    "bowie-look-right2.png": {
       "frame": {
         "x": 195,
         "y": 0,
@@ -168,7 +168,7 @@
         "y": 0.5
       }
     },
-    "bowie-standing1.png": {
+    "bowie-look-up2.png": {
       "frame": {
         "x": 227,
         "y": 0,
