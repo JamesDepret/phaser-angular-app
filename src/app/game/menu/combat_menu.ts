@@ -1,11 +1,6 @@
-import { createAnimation } from "src/app/utils/anim";
 import BaseMenu from "./base_menu";
-import { sprite } from "./sprite/sprite";
-
 
 export default class CombatMenu extends BaseMenu {
-
-
     constructor(scene: Phaser.Scene) {
         super(scene);
         this.scene = scene;

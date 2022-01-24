@@ -18,7 +18,7 @@ export default class BaseMenu {
         this.MENUPOSITION.height = height - 64;
     }
 
-    toggleMenu(condition: boolean){
+    public toggleMenu(condition: boolean){
         if(condition) {
             this.createMenu(this.UP);
             this.createMenu(this.LEFT);
@@ -33,7 +33,7 @@ export default class BaseMenu {
         }
     }
 
-    cursorInput(cursor: Phaser.Types.Input.Keyboard.CursorKeys) {
+    public cursorInput(cursor: Phaser.Types.Input.Keyboard.CursorKeys) {
         if(cursor.left?.isDown){
             this.playAnimation(this.LEFT.name);
         } 
@@ -48,7 +48,7 @@ export default class BaseMenu {
         }
     }
 
-    playAnimation(anim: string) {
+    protected playAnimation(anim: string) {
         this.UP.spriteBody!.stop();
         this.LEFT.spriteBody!.stop();
         this.RIGHT.spriteBody!.stop();
