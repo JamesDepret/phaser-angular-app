@@ -49,10 +49,10 @@ export default class BaseMenu {
     }
 
     protected playAnimation(anim: string) {
-        this.UP.spriteBody!.stop();
-        this.LEFT.spriteBody!.stop();
-        this.RIGHT.spriteBody!.stop();
-        this.DOWN.spriteBody!.stop();
+        this.StopAnimation(this.UP);
+        this.StopAnimation(this.DOWN);
+        this.StopAnimation(this.LEFT);
+        this.StopAnimation(this.RIGHT);
 
         if(anim == this.UP.name){ 
             this.UP.spriteBody!.play(this.UP.name); 
@@ -63,6 +63,12 @@ export default class BaseMenu {
         }  else if(anim == this.RIGHT.name){ 
             this.RIGHT.spriteBody!.play(this.RIGHT.name); 
         }
+    }
+
+    private StopAnimation(sprite: sprite){
+        
+        sprite.spriteBody!.setFrame(0);
+        sprite.spriteBody!.stop();
     }
     
 	protected createMenu(menu: sprite) {
