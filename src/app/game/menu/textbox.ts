@@ -36,7 +36,9 @@ export default class TextBox  {
         this.rects.push(graphics.fillRect(x+8, y+8, width-16, height-16));
         
         this.mask = new Phaser.Display.Masks.GeometryMask(this.scene, graphics);
-        this.text = this.scene.add.text(x+16, y+16, content, { fontFamily: 'Arial', color: '#ffffff', wordWrap: { width: width-64 } }).setOrigin(0);
+        this.text = this.scene.add.text(x+16, y+16, content, { fontFamily: 'Arial', color: '#ffffff', wordWrap: { width: width-64 }  }).setOrigin(0);
+
+        
         this.text.setMask(this.mask);
     }
 

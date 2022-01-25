@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "version": "0.6.7"
+  },
+  "savePath": "",
+  "images": [
+    {
+      "name": "gizmo-look-down1.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/enemies/gizmo/gizmo-look-down1.png",
+      "folder": ""
+    },
+    {
+      "name": "gizmo-look-down2.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/enemies/gizmo/gizmo-look-down2.png",
+      "folder": ""
+    },
+    {
+      "name": "gizmo-look-left1.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/enemies/gizmo/gizmo-look-left1.png",
+      "folder": ""
+    },
+    {
+      "name": "gizmo-look-left2.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/enemies/gizmo/gizmo-look-left2.png",
+      "folder": ""
+    },
+    {
+      "name": "gizmo-look-right1.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/enemies/gizmo/gizmo-look-right1.png",
+      "folder": ""
+    },
+    {
+      "name": "gizmo-look-right2.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/enemies/gizmo/gizmo-look-right2.png",
+      "folder": ""
+    },
+    {
+      "name": "gizmo-look-up1.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/enemies/gizmo/gizmo-look-up1.png",
+      "folder": ""
+    },
+    {
+      "name": "gizmo-look-up2.png",
+      "path": "C:/Users/james/Desktop/phaserGame/phaser-angular-app/src/assets/enemies/gizmo/gizmo-look-up2.png",
+      "folder": ""
+    }
+  ],
+  "folders": [],
+  "packOptions": {
+    "textureName": "gizmo",
+    "textureFormat": "png",
+    "removeFileExtension": false,
+    "prependFolderName": true,
+    "base64Export": false,
+    "tinify": false,
+    "tinifyKey": "",
+    "scale": 1,
+    "filter": "none",
+    "exporter": "JSON (hash)",
+    "fileName": "pack-result",
+    "savePath": "",
+    "width": 2048,
+    "height": 2048,
+    "fixedSize": false,
+    "powerOfTwo": false,
+    "padding": 0,
+    "extrude": 0,
+    "allowRotation": true,
+    "allowTrim": true,
+    "trimMode": "trim",
+    "alphaThreshold": "0",
+    "detectIdentical": true,
+    "packer": "MaxRectsBin",
+    "packerMethod": "BestShortSideFit"
+  }
+}
