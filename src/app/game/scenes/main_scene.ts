@@ -1,15 +1,14 @@
 import Phaser from 'phaser';
 import { createCharacter } from 'src/app/utils/character';
 import { debugHelperDisplayWalls } from 'src/app/utils/debug';
+import Character from '../character/character';
 import CombatMenu from '../menu/combat_menu';
 
 export class MainScene extends Phaser.Scene {
 	private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-	private bowie!: Phaser.Physics.Arcade.Sprite;
-	private gizmos: Phaser.Physics.Arcade.Sprite[] = [];
-	private SPEED: number = 200;
-	private MenuOpened: boolean = false;
-	private combatMenu!: CombatMenu;
+	private bowie!: Character;
+	private gizmos: Character[] = [];
+	private activeChar!: Character;
 
     constructor() {
       super({ key: 'game' });
@@ -25,18 +24,18 @@ export class MainScene extends Phaser.Scene {
         groundLayer.setCollisionByProperty({ collides: true });
 		//debugHelperDisplayWalls(groundLayer, this);
 
-		this.bowie = createCharacter(this, 'bowie', 240, 592);
-		this.physics.add.collider(this.bowie, groundLayer);
+		this.bowie = new Character(this, 'bowie', 240, 592, 12, 7, 3);
+		this.activeChar = this.bowie;
+		this.bowie.addColiders(groundLayer);
 		this.createGizmos();
 		this.addGizmoColliders(this.bowie, groundLayer);
 
-		this.combatMenu = new CombatMenu(this);
     }
     override update() {
 		if(!this.cursors || !this.bowie) {
 			return;
 		}
-		this.setCursorValidation('bowie', this.bowie);
+		this.activeChar.setCursorValidation(this.cursors);
     }
 
 //#region PRIVATE FUNCTIONS
@@ -45,73 +44,22 @@ export class MainScene extends Phaser.Scene {
     
 	private createGizmos() {
 		this.gizmos = [];
-		this.gizmos.push(createCharacter(this, 'gizmo', 208, 144));
-		this.gizmos.push(createCharacter(this, 'gizmo', 208, 112));
-		this.gizmos.push(createCharacter(this, 'gizmo', 240, 80));
-		this.gizmos.push(createCharacter(this, 'gizmo', 272, 80));
-		this.gizmos.push(createCharacter(this, 'gizmo', 304, 112));
-		this.gizmos.push(createCharacter(this, 'gizmo', 304, 144));
+		this.gizmos.push(new Character(this, 'gizmo', 208, 144, 5, 7, 3));
+		this.gizmos.push(new Character(this, 'gizmo', 208, 112, 5, 7, 3));
+		this.gizmos.push(new Character(this, 'gizmo', 240, 80 , 5, 7, 3));
+		this.gizmos.push(new Character(this, 'gizmo', 272, 80 , 5, 7, 3));
+		this.gizmos.push(new Character(this, 'gizmo', 304, 112, 5, 7, 3));
+		this.gizmos.push(new Character(this, 'gizmo', 304, 144, 5, 7, 3));
 	}
 
-	private addGizmoColliders(char: Phaser.Physics.Arcade.Sprite, layer: Phaser.Tilemaps.TilemapLayer){
+	private addGizmoColliders(char: Character, layer: Phaser.Tilemaps.TilemapLayer){
 		this.gizmos.forEach(gizmo => {
-			this.physics.add.collider(char, gizmo);
-			this.physics.add.collider(gizmo, layer);
+			gizmo.addColiders(char.sprite);
+			gizmo.addColiders(layer);
+			this.physics.add.collider(gizmo.sprite, layer);
 		})
 	}
 
 	
-	private lastMoveUpOrLeft: boolean = false;
-	private spaceDown: boolean = false;
-	private setCursorValidation(charName: string, charObj: Phaser.Physics.Arcade.Sprite){
-		if(this.cursors.space?.isDown && this.spaceDown == false){
-			this.spaceDown = true;
-			this.MenuOpened = !this.MenuOpened;
-			let EnemyNear = false; // TODO: set value based on range to enemy
-			this.combatMenu.toggleCombatMenu(this.MenuOpened, EnemyNear); 
-		} else if (this.cursors.space?.isUp && this.spaceDown) {
-			this.spaceDown = false;
-		}
-		if(this.MenuOpened){
-			this.combatMenu.cursorInput(this.cursors);
-		} else {
-			if(this.cursors.left?.isDown){
-				charObj.setVelocity(-this.SPEED,0);
-				this.lastMoveUpOrLeft = true;
-				charObj.anims.play(charName + '-look-left', true);
-			} 
-			else if (this.cursors.right?.isDown) {
-				charObj.setVelocity(this.SPEED, 0);
-				this.lastMoveUpOrLeft = false;
-				charObj.anims.play(charName + '-look-right', true);
-			} 
-			else if(this.cursors.down?.isDown){
-				charObj.setVelocity(0,this.SPEED);
-				this.lastMoveUpOrLeft = false;
-				charObj.anims.play(charName + '-look-down', true);
-			} 
-			else if (this.cursors.up?.isDown) {
-				charObj.setVelocity(0, -this.SPEED);
-				this.lastMoveUpOrLeft = true;
-				charObj.anims.play(charName + '-look-up', true);
-			} else {
-				charObj.setVelocity(0);
-				let xPosition = charObj.x;
-				let yPosition = charObj.y;
-				if((xPosition + 16) % 32 != 0) {
-					charObj.setX(this.lastMoveUpOrLeft ? this.round32(xPosition-24) + 16 : this.round32(xPosition+24) - 16);
-				}
-				
-				if((yPosition + 16) % 32 != 0) {
-					charObj.setY(this.lastMoveUpOrLeft ? this.round32(yPosition-24) + 16 : this.round32(yPosition+24) - 16);
-				}
-			}
-		}
-	}
-
-	round32(value: number): number{
-		return 32 * (Math.round(value / 32));
-	}
-
 //#endregion PRIVATE FUNCTIONS
 }
