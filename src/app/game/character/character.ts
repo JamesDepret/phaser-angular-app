@@ -16,7 +16,6 @@ export default class Character  {
 	private SPRITESPEED: number = 200;
 	private combatMenu!: CombatMenu;
     private movementRects: Phaser.GameObjects.Graphics[] = [];
-    private graphics: Phaser.GameObjects.Graphics;
 
     constructor(scene: Phaser.Scene, name: string, xPos: number, yPos: number, hp: number,  speed: number, damage: number) {
         this.scene = scene;
@@ -31,11 +30,6 @@ export default class Character  {
 		this.combatMenu = new CombatMenu(scene);
         
 		this._sprite = createCharacter(scene, name, xPos, yPos);
-        this.graphics = this.scene.make.graphics({
-            x: 0,
-            y: 0,
-            add: true
-        });
     }
 
     public addColiders(colliderObj: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[] | Phaser.GameObjects.Group | Phaser.GameObjects.Group[]){
@@ -101,37 +95,56 @@ export default class Character  {
         this._currentHp = v;
     }
     
+    private removeRectsTimeStamp: Date | null = null;
+    private addRectsTimeStamp: Date | null = null;
+    private startMovementAnimation: boolean = false;
     private movementDisplayed: boolean = false;
-    public showMovement() {
-        if(!this.movementDisplayed){
-            this.movementDisplayed = true;
-            this.loopMovement();
-        }    
+    public movement(state: boolean){
+        if(state){
+            if(!this.startMovementAnimation){
+                this.startMovementAnimation = true;
+                this.movementDisplayed = true;
+                this.addRectsTimeStamp = new Date();
+            }
+            this.movementAnimation();
+
+        } else {
+            this.startMovementAnimation = false;
+            this.movementRects.forEach(r => r.destroy());
+            this.movementRects = [];
+            this.movementDisplayed = false;
+        }
     }
-    // TODO: DEBUG: it only gets displayed once instead of blinking
-    private loopMovement(){
+    private movementAnimation() {
+        let graphics: Phaser.GameObjects.Graphics = this.createNewGraphic();
+        let timeoutTime = 500;
         if(this.movementDisplayed){
-            console.log('display rects' + new Date().toLocaleTimeString())
-            this.graphics.fillStyle(0x000000, 0.5);
-            this.movementRects.push(this.graphics.fillRect(this.currentXPosition-this.speed*16, this.currentYPosition-this.speed * 16, this.speed * 32, this.speed * 32));    
-            
-            let timeoutTime = 1000;
-            setTimeout(() => {
+            if (this.addRectsTimeStamp && new Date(Date.now()) > this.addRectsTimeStamp) {
+                console.log('display rects' + new Date().toLocaleTimeString())
+                graphics.fillStyle(0x000000, 0.4);
+                this.movementRects.push(graphics.fillRect(this.currentXPosition-this.speed*16, this.currentYPosition-this.speed * 16, this.speed * 32, this.speed * 32));    
+                this.addRectsTimeStamp = null;
+                this.removeRectsTimeStamp = new Date(Date.now() + timeoutTime);
+
+            } else if (this.removeRectsTimeStamp && new Date(Date.now()) > this.removeRectsTimeStamp) {
                 console.log('remove rects'+ new Date().toLocaleTimeString())
                 this.movementRects.forEach(r => r.destroy());
                 this.movementRects = [];
-                setTimeout(() => {
-                    this.loopMovement();
-                }, timeoutTime);
-            }, timeoutTime);
+                this.removeRectsTimeStamp = null;
+                this.addRectsTimeStamp = new Date(Date.now() + timeoutTime);
+
+            }
         }
+
+    }
+    private createNewGraphic(): Phaser.GameObjects.Graphics {
+        return this.scene.make.graphics({
+            x: 0,
+            y: 0,
+            add: true
+        });
     }
 
-    private hideMovement() {
-        this.movementRects.forEach(r => r.destroy());
-        this.movementRects = [];
-        this.movementDisplayed = false;
-    }
     
     
 	private MenuOpened: boolean = false;
@@ -149,9 +162,9 @@ export default class Character  {
 		}
 		if(this.MenuOpened){
 			this.combatMenu.cursorInput(cursors);
-            this.showMovement();
+            this.movement(true);
 		} else {
-            this.hideMovement();
+            this.movement(false);
 			if(cursors.left?.isDown){
 				this.sprite.setVelocity(-this.SPRITESPEED,0);
 				this.lastMoveUpOrLeft = true;
