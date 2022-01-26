@@ -17,8 +17,8 @@ export class GameComponent {
   constructor() {
     this.config = {
       type: Phaser.AUTO,
-      height: 640,
-      width: 600,
+      height: 32 * 20,
+      width: 32 * 16,
       physics: {
         default: 'arcade',
         arcade: {

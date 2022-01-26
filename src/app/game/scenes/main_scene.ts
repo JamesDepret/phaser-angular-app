@@ -22,12 +22,15 @@ export class MainScene extends Phaser.Scene {
         const groundLayer = map.createLayer('ground', tileset);
         //map.createLayer('upper', tileset); // this is how you add additional layers on top of each other
         groundLayer.setCollisionByProperty({ collides: true });
+		groundLayer.forEachTile(tile =>{ 
+			console.log("x: " + tile.x + ", y: " + tile.y + ", can collide: " + tile.canCollide);
+		})
 		//debugHelperDisplayWalls(groundLayer, this);
 
-		this.bowie = new Character(this, 'bowie', 240, 592, 12, 7, 3);
+		this.bowie = new Character(this, 'bowie', 240, 592, 12, 7, 3, groundLayer);
 		this.activeChar = this.bowie;
 		this.bowie.addColiders(groundLayer);
-		this.createGizmos();
+		this.createGizmos(groundLayer);
 		this.addGizmoColliders(this.bowie, groundLayer);
 
     }
@@ -42,14 +45,14 @@ export class MainScene extends Phaser.Scene {
 	
 
     
-	private createGizmos() {
+	private createGizmos(layer: Phaser.Tilemaps.TilemapLayer) {
 		this.gizmos = [];
-		this.gizmos.push(new Character(this, 'gizmo', 208, 144, 5, 7, 3));
-		this.gizmos.push(new Character(this, 'gizmo', 208, 112, 5, 7, 3));
-		this.gizmos.push(new Character(this, 'gizmo', 240, 80 , 5, 7, 3));
-		this.gizmos.push(new Character(this, 'gizmo', 272, 80 , 5, 7, 3));
-		this.gizmos.push(new Character(this, 'gizmo', 304, 112, 5, 7, 3));
-		this.gizmos.push(new Character(this, 'gizmo', 304, 144, 5, 7, 3));
+		this.gizmos.push(new Character(this, 'gizmo', 208, 144, 5, 7, 3, layer));
+		this.gizmos.push(new Character(this, 'gizmo', 208, 112, 5, 7, 3, layer));
+		this.gizmos.push(new Character(this, 'gizmo', 240, 80 , 5, 7, 3, layer));
+		this.gizmos.push(new Character(this, 'gizmo', 272, 80 , 5, 7, 3, layer));
+		this.gizmos.push(new Character(this, 'gizmo', 304, 112, 5, 7, 3, layer));
+		this.gizmos.push(new Character(this, 'gizmo', 304, 144, 5, 7, 3, layer));
 	}
 
 	private addGizmoColliders(char: Character, layer: Phaser.Tilemaps.TilemapLayer){
