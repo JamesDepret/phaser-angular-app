@@ -111,13 +111,13 @@ export default class Character  {
     // TODO: DEBUG: it only gets displayed once instead of blinking
     private loopMovement(){
         if(this.movementDisplayed){
-            console.log('display rects')
+            console.log('display rects' + new Date().toLocaleTimeString())
             this.graphics.fillStyle(0x000000, 0.5);
             this.movementRects.push(this.graphics.fillRect(this.currentXPosition-this.speed*16, this.currentYPosition-this.speed * 16, this.speed * 32, this.speed * 32));    
             
             let timeoutTime = 1000;
             setTimeout(() => {
-                console.log('remove rects')
+                console.log('remove rects'+ new Date().toLocaleTimeString())
                 this.movementRects.forEach(r => r.destroy());
                 this.movementRects = [];
                 setTimeout(() => {

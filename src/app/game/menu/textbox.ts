@@ -13,15 +13,6 @@ export default class TextBox  {
         var graphics = this.scene.make.graphics({
             x: 0,
             y: 0,
-            lineStyle: {
-                width: 15,
-                color: 0xfdd252,
-                alpha: 1
-            },
-            fillStyle: {
-                color: 0x002590,
-                alpha: 1
-            },
             add: true
         });
         graphics.fillStyle(0x874a00);
