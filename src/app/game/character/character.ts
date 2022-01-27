@@ -13,25 +13,15 @@ export default class Character  {
     private _currentHp : number;
     private _name : string;
     private _canFly : boolean;
-    private _currentMap!: Phaser.Tilemaps.TilemapLayer;
+    private _currentMap: Phaser.Tilemaps.TilemapLayer;
     private _currentCoordinate : Coordinate;
     private movableCoordinates: Coordinate[] = [];
-    
-    public get currentCoordinate() : Coordinate {
-        return this._currentCoordinate;
-    }
-    public set currentCoordinate(v : Coordinate) {
-        this._currentCoordinate = v;
-    }
-    
+     
 
 	private SPRITESPEED: number = 200;
 	private combatMenu!: CombatMenu;
     private movementRects: Phaser.GameObjects.Graphics[] = [];
 
-    calculateMovableCoordinates(){
-        console.log(this.name + ' -> xtile: ' + this._currentCoordinate.x + ', ytile: ' + this._currentCoordinate.y);
-    }
 
     constructor(scene: Phaser.Scene, name: string, xPos: number, yPos: number, hp: number,  speed: number, damage: number, currentMap: Phaser.Tilemaps.TilemapLayer, canFly: boolean = false) {
         this.scene = scene;
@@ -45,9 +35,55 @@ export default class Character  {
         this._canFly = canFly;
         
 		this.combatMenu = new CombatMenu(scene);
-        this._currentCoordinate = {x: (xPos + 16) /32, y: (yPos + 16)/32};
+        this._currentCoordinate = {x: (xPos + 16) /32 - 1, y: (yPos + 16)/32 - 1} ;
 		this._sprite = createCharacter(scene, name, xPos, yPos);
-        this.calculateMovableCoordinates()
+        this._currentMap = currentMap;
+        //this.calculateMovableCoordinates()
+    }
+
+    
+    calculateMovableCoordinates(){
+        //console.log(this.name + ' -> xtile: ' + this._currentCoordinate.x + ', ytile: ' + this._currentCoordinate.y);
+        this.movableCoordinates = [];
+        console.log(this.speed);
+        this.recursiveCoordinate(this.speed + 1,this.currentCoordinate.x,this.currentCoordinate.y, this.currentCoordinate.x,this.currentCoordinate.y);
+        this.movableCoordinates.sort((a, b) => a.x - b.x)
+        this.movableCoordinates.sort((a, b) => a.y - b.y)
+        this.movableCoordinates.forEach(c => console.log(this.name + ' -> xtile: ' + (c.x +1)+ ', ytile: ' + (c.y + 1)));
+    }
+
+    private recursiveCoordinate(remainingSpeed: number, x: number, y: number, previousX: number, previousY: number){
+        this.validateXCoordinate(x, previousX,  x + 1, y, remainingSpeed);
+        this.validateXCoordinate(x, previousX, x - 1, y, remainingSpeed);
+        this.validateYCoordinate(y, previousY, y + 1, x, remainingSpeed);
+        this.validateYCoordinate(y, previousY, y - 1, x, remainingSpeed);
+    }
+
+    // !! before pushing to the next recursion, validate if said coordinate is already in the list
+
+    private validateXCoordinate(x: number, previousX: number, newX: number, y: number, remainingSpeed: number) {
+        if (x == previousX || !(newX == previousX)) {
+            let horizontalTile: Phaser.Tilemaps.Tile = this.currentMap.getTileAt(newX, y);
+            let tile = this.movableCoordinates.find(c => c.x == newX && c.y == y);
+            if (!tile && horizontalTile && !horizontalTile.canCollide) {
+                this.movableCoordinates.push({ x: newX, y });
+                //console.log(this.name + " => added x: "+ newX + " ; y: " + y)
+                if(remainingSpeed - 1 > 0)
+                    this.recursiveCoordinate(remainingSpeed - 1, newX, y, x, y);
+            }
+        }
+    }
+    private validateYCoordinate(y: number, previousY: number, newY: number, x: number, remainingSpeed: number) {
+        if (y == previousY || !(newY == previousY)) {
+            let verticalTile: Phaser.Tilemaps.Tile = this.currentMap.getTileAt(x, newY);
+            let tile = this.movableCoordinates.find(c => c.x == x && c.y == newY);
+            if (!tile && verticalTile && !verticalTile.canCollide) {
+                this.movableCoordinates.push({ x: x, y: newY });
+                //console.log(this.name +" => added x: "+ x + " ; y: " + newY)
+                if(remainingSpeed - 1 > 0)
+                    this.recursiveCoordinate(remainingSpeed - 1, x, newY, x, y);
+            }
+        }
     }
 
     public addColiders(colliderObj: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[] | Phaser.GameObjects.Group | Phaser.GameObjects.Group[]){
@@ -55,6 +91,13 @@ export default class Character  {
     }
     
     
+    public get currentCoordinate() : Coordinate {
+        return this._currentCoordinate;
+    }
+    public set currentCoordinate(v : Coordinate) {
+        this._currentCoordinate = v;
+    }
+
     public get currentMap() : Phaser.Tilemaps.TilemapLayer {
         return this._currentMap;
     }
@@ -150,12 +193,10 @@ export default class Character  {
         }
     }
     private movementAnimation() {
-        let graphics: Phaser.GameObjects.Graphics = this.createNewGraphic();
         let timeoutTime = 400;
         if(this.movementDisplayed){
             if (this.addRectsTimeStamp && new Date(Date.now()) > this.addRectsTimeStamp) {
-                graphics.fillStyle(0x000000, 0.4);
-                this.movementRects.push(graphics.fillRect(this.currentXPosition-this.speed*16, this.currentYPosition-this.speed * 16, this.speed * 32, this.speed * 32));    
+                this.drawMovement();
                 this.addRectsTimeStamp = null;
                 this.removeRectsTimeStamp = new Date(Date.now() + timeoutTime);
 
@@ -167,8 +208,16 @@ export default class Character  {
 
             }
         }
-
     }
+
+    private drawMovement() {
+        let graphics: Phaser.GameObjects.Graphics = this.createNewGraphic();
+        graphics.fillStyle(0x000000, 0.4);
+        this.movableCoordinates.forEach(c => {
+            this.movementRects.push(graphics.fillRect(c.x * 32, c.y * 32, 32, 32)); 
+        })   
+    }
+
     private createNewGraphic(): Phaser.GameObjects.Graphics {
         return this.scene.make.graphics({
             x: 0,
