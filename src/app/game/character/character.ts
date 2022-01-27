@@ -44,45 +44,31 @@ export default class Character  {
     
     calculateMovableCoordinates(){
         //console.log(this.name + ' -> xtile: ' + this._currentCoordinate.x + ', ytile: ' + this._currentCoordinate.y);
-        this.movableCoordinates = [];
-        console.log(this.speed);
-        this.recursiveCoordinate(this.speed + 1,this.currentCoordinate.x,this.currentCoordinate.y, this.currentCoordinate.x,this.currentCoordinate.y);
+        this.movableCoordinates = [{x: this.currentCoordinate.x, y: this.currentCoordinate.y}];
+        if(this.speed > 0) this.recursiveCoordinate(this.speed,this.currentCoordinate.x,this.currentCoordinate.y);
         this.movableCoordinates.sort((a, b) => a.x - b.x)
         this.movableCoordinates.sort((a, b) => a.y - b.y)
-        this.movableCoordinates.forEach(c => console.log(this.name + ' -> xtile: ' + (c.x +1)+ ', ytile: ' + (c.y + 1)));
+        this.movableCoordinates.forEach(c => console.log(this.name + ' -> xtile: ' + (c.x )+ ', ytile: ' + (c.y )));
     }
 
-    private recursiveCoordinate(remainingSpeed: number, x: number, y: number, previousX: number, previousY: number){
-        this.validateXCoordinate(x, previousX,  x + 1, y, remainingSpeed);
-        this.validateXCoordinate(x, previousX, x - 1, y, remainingSpeed);
-        this.validateYCoordinate(y, previousY, y + 1, x, remainingSpeed);
-        this.validateYCoordinate(y, previousY, y - 1, x, remainingSpeed);
+    private recursiveCoordinate(remainingSpeed: number, x: number, y: number){
+        this.validateCoordinate(x + 1, y, remainingSpeed);
+        this.validateCoordinate(x - 1, y, remainingSpeed);
+        this.validateCoordinate(x, y + 1, remainingSpeed);
+        this.validateCoordinate(x, y - 1, remainingSpeed);
     }
 
     // !! before pushing to the next recursion, validate if said coordinate is already in the list
-
-    private validateXCoordinate(x: number, previousX: number, newX: number, y: number, remainingSpeed: number) {
-        if (x == previousX || !(newX == previousX)) {
-            let horizontalTile: Phaser.Tilemaps.Tile = this.currentMap.getTileAt(newX, y);
-            let tile = this.movableCoordinates.find(c => c.x == newX && c.y == y);
-            if (!tile && horizontalTile && !horizontalTile.canCollide) {
-                this.movableCoordinates.push({ x: newX, y });
-                //console.log(this.name + " => added x: "+ newX + " ; y: " + y)
-                if(remainingSpeed - 1 > 0)
-                    this.recursiveCoordinate(remainingSpeed - 1, newX, y, x, y);
-            }
+    private validateCoordinate(x: number, y: number, remainingSpeed: number) {
+        let newTile: Phaser.Tilemaps.Tile = this.currentMap.getTileAt(x, y);
+        let tileInList = this.movableCoordinates.find(c => c.x == newTile.x && c.y == newTile.y);
+        if(newTile.x ==7 && newTile.y==16) {
+            console.log(newTile.x + "; " + newTile.y + "; inlist: " + tileInList ? 'true' : 'false');
         }
-    }
-    private validateYCoordinate(y: number, previousY: number, newY: number, x: number, remainingSpeed: number) {
-        if (y == previousY || !(newY == previousY)) {
-            let verticalTile: Phaser.Tilemaps.Tile = this.currentMap.getTileAt(x, newY);
-            let tile = this.movableCoordinates.find(c => c.x == x && c.y == newY);
-            if (!tile && verticalTile && !verticalTile.canCollide) {
-                this.movableCoordinates.push({ x: x, y: newY });
-                //console.log(this.name +" => added x: "+ x + " ; y: " + newY)
-                if(remainingSpeed - 1 > 0)
-                    this.recursiveCoordinate(remainingSpeed - 1, x, newY, x, y);
-            }
+        if (newTile && !newTile.canCollide ) {
+            if (!tileInList) this.movableCoordinates.push({ x: x, y });
+            if(remainingSpeed - 1 > 0)
+                this.recursiveCoordinate(remainingSpeed - 1, x, y);
         }
     }
 

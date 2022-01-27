@@ -22,9 +22,9 @@ export class MainScene extends Phaser.Scene {
         const groundLayer = map.createLayer('ground', tileset);
         //map.createLayer('upper', tileset); // this is how you add additional layers on top of each other
         groundLayer.setCollisionByProperty({ collides: true });
-		debugHelperDisplayWalls(groundLayer, this);
+		//debugHelperDisplayWalls(groundLayer, this);
 
-		this.bowie = new Character(this, 'bowie', 240, 592, 12, 5, 3, groundLayer);
+		this.bowie = new Character(this, 'bowie', 240, 592, 12, 6, 3, groundLayer);
 		this.bowie.calculateMovableCoordinates();
 		this.activeChar = this.bowie;
 		this.bowie.addColiders(groundLayer);
