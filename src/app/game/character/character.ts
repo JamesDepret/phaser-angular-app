@@ -43,8 +43,10 @@ export default class Character  {
 
     
     calculateMovableCoordinates(){
-        this.movableCoordinates = [{x: this.currentCoordinate.x, y: this.currentCoordinate.y}];
+        this.movableCoordinates = [{x: this.currentCoordinate.x, y: this.currentCoordinate.y, remainingSpeed: this.speed}];
         if(this.speed > 0) this.recursiveCoordinate(this.speed,this.currentCoordinate.x,this.currentCoordinate.y);
+        console.log(this.num);
+        console.log(this.movableCoordinates);
     }
 
     private recursiveCoordinate(remainingSpeed: number, x: number, y: number){
@@ -53,13 +55,17 @@ export default class Character  {
         this.validateCoordinate(x, y + 1, remainingSpeed);
         this.validateCoordinate(x, y - 1, remainingSpeed);
     }
-
+    num: number = 0;
     private validateCoordinate(x: number, y: number, remainingSpeed: number) {
         let newTile: Phaser.Tilemaps.Tile = this.currentMap.getTileAt(x, y);
-        //TODO add remainingSpeed to object, if remaining speed of OBJ > current speed, we should do a recursion
         let tileInList = this.movableCoordinates.find(c => c.x == newTile.x && c.y == newTile.y);
-        if (newTile && !newTile.canCollide ) {
-            if (!tileInList) this.movableCoordinates.push({ x: x, y });
+        this.num++;
+        if (newTile && !newTile.canCollide && (remainingSpeed >= tileInList?.remainingSpeed! || !tileInList)) {
+            if(!tileInList) {
+                this.movableCoordinates.push({ x: x, y , remainingSpeed });
+            } else {
+                tileInList.remainingSpeed = remainingSpeed;
+            }
             if(remainingSpeed - 1 > 0)
                 this.recursiveCoordinate(remainingSpeed - 1, x, y);
         }

@@ -1,4 +1,5 @@
 export interface Coordinate{
     x: number,
-    y: number
+    y: number,
+    remainingSpeed?: number
 }
