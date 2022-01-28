@@ -24,7 +24,7 @@ export class MainScene extends Phaser.Scene {
         groundLayer.setCollisionByProperty({ collides: true });
 		//debugHelperDisplayWalls(groundLayer, this);
 
-		this.bowie = new Character(this, 'bowie', 240, 592, 12, 6, 3, groundLayer);
+		this.bowie = new Character(this, 'bowie', 240, 528, 12, 2, 3, groundLayer);
 		this.bowie.calculateMovableCoordinates();
 		this.activeChar = this.bowie;
 		this.bowie.addColiders(groundLayer);

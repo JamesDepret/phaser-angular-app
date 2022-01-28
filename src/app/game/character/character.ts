@@ -36,6 +36,7 @@ export default class Character  {
         
 		this.combatMenu = new CombatMenu(scene);
         this._currentCoordinate = {x: (xPos + 16) /32 - 1, y: (yPos + 16)/32 - 1} ;
+        this.lastKnowAllowedCoordinate = this._currentCoordinate;
 		this._sprite = createCharacter(scene, name, xPos, yPos);
         this._currentMap = currentMap;
         //this.calculateMovableCoordinates()
@@ -45,7 +46,6 @@ export default class Character  {
     calculateMovableCoordinates(){
         this.movableCoordinates = [{x: this.currentCoordinate.x, y: this.currentCoordinate.y, remainingSpeed: this.speed}];
         if(this.speed > 0) this.recursiveCoordinate(this.speed,this.currentCoordinate.x,this.currentCoordinate.y);
-        console.log(this.num);
         console.log(this.movableCoordinates);
     }
 
@@ -214,8 +214,11 @@ export default class Character  {
     
     
 	private MenuOpened: boolean = false;
-	private lastMoveUpOrLeft: boolean = false;
+	private lastMoveUp: boolean = false;
+    private lastMoveLeft: boolean = false;
+    private lastMoveRight: boolean = false;
 	private spaceDown: boolean = false;
+    private lastKnowAllowedCoordinate: Coordinate;
 	public setCursorValidation(cursors: Phaser.Types.Input.Keyboard.CursorKeys ){
         
         if(cursors.space?.isDown && this.spaceDown == false){
@@ -232,36 +235,67 @@ export default class Character  {
             this.movement(false);
 		} else {
             this.movement(true);
-			if(cursors.left?.isDown){
-				this.sprite.setVelocity(-this.SPRITESPEED,0);
-				this.lastMoveUpOrLeft = true;
-				this.sprite.anims.play(this.name + '-look-left', true);
+            let xPos = this.round32(this.sprite.x);
+            let yPos = this.round32(this.sprite.y);
+            
+            let xCoord = (xPos + 16)/32 - 1.5;
+            let yCoord = (yPos + 16)/32 - 1.5;
+
+            let CoordinateInList = this.movableCoordinates.find(c => c.x == xCoord && c.y == yCoord );
+            if(CoordinateInList) this.lastKnowAllowedCoordinate = CoordinateInList;
+
+            console.log(xCoord + " ; " + yCoord);
+			if(cursors.left?.isDown && CoordinateInList){
+                this.sprite.setVelocity(-this.SPRITESPEED,0);
+                this.lastMoveUp = false;
+                this.lastMoveLeft = true;
+                this.lastMoveRight = false;
+                this.sprite.anims.play(this.name + '-look-left', true);
 			} 
-			else if (cursors.right?.isDown) {
-				this.sprite.setVelocity(this.SPRITESPEED, 0);
-				this.lastMoveUpOrLeft = false;
-				this.sprite.anims.play(this.name + '-look-right', true);
+			else if (cursors.right?.isDown && CoordinateInList) {
+                this.sprite.setVelocity(this.SPRITESPEED, 0);
+                this.lastMoveUp = false;
+                this.lastMoveLeft = false;
+                this.lastMoveRight = true;
+                this.sprite.anims.play(this.name + '-look-right', true);
 			} 
-			else if(cursors.down?.isDown){
-				this.sprite.setVelocity(0,this.SPRITESPEED);
-				this.lastMoveUpOrLeft = false;
-				this.sprite.anims.play(this.name + '-look-down', true);
+			else if(cursors.down?.isDown && CoordinateInList){
+                this.sprite.setVelocity(0,this.SPRITESPEED);
+                this.lastMoveUp = false;
+                this.lastMoveLeft = false;
+                this.lastMoveRight = false;
+                this.sprite.anims.play(this.name + '-look-down', true);
 			} 
-			else if (cursors.up?.isDown) {
-				this.sprite.setVelocity(0, -this.SPRITESPEED);
-				this.lastMoveUpOrLeft = true;
-				this.sprite.anims.play(this.name + '-look-up', true);
-			} else {
-				this.sprite.setVelocity(0);
-				let xPosition = this.sprite.x;
-				let yPosition = this.sprite.y;
-				if((xPosition + 16) % 32 != 0) {
-					this.sprite.setX(this.lastMoveUpOrLeft ? this.round32(xPosition-24) + 16 : this.round32(xPosition+24) - 16);
-				}
-				
-				if((yPosition + 16) % 32 != 0) {
-					this.sprite.setY(this.lastMoveUpOrLeft ? this.round32(yPosition-24) + 16 : this.round32(yPosition+24) - 16);
-				}
+			else if (cursors.up?.isDown && CoordinateInList) {
+                this.sprite.setVelocity(0, -this.SPRITESPEED);
+                this.lastMoveUp = true;
+                this.lastMoveLeft = false;
+                this.lastMoveRight = false;
+                this.sprite.anims.play(this.name + '-look-up', true);
+			} else {this.sprite.setVelocity(0);
+                let xPosition = this.sprite.x;
+                let yPosition = this.sprite.y;
+                if ((xPosition + 16) % 32 != 0) {
+                    if(this.lastMoveLeft) { this.sprite.setX(this.round32(xPosition - 24) + 16 ); }
+                    if(this.lastMoveRight) { this.sprite.setX(this.round32(xPosition + 24) - 16 ); }
+                }
+        
+                if ((yPosition + 16) % 32 != 0) {
+                    if(this.lastMoveLeft) { this.sprite.setY(this.round32(yPosition - 24) + 16 ); }
+                    if(!this.lastMoveRight && !this.lastMoveLeft && !this.lastMoveUp) { this.sprite.setY(this.round32(yPosition + 24) - 16 ); }
+                }
+                xPosition = this.sprite.x;
+                yPosition = this.sprite.y;
+                let xCoord = (this.round32(xPosition) + 16) /32 - 1.5;
+                let yCoord = (this.round32(yPosition) + 16)/32 - 1.5;
+                let CoordinateInList = this.movableCoordinates.find(c => c.x == xCoord && c.y == yCoord );
+                if(!CoordinateInList) {
+                    console.log('coordinateNotInList')
+                    if(this.lastMoveUp){ this.sprite.setY(this.lastKnowAllowedCoordinate.y * 32 + 16); }
+                    else if( this.lastMoveLeft ){ this.sprite.setX(this.lastKnowAllowedCoordinate.x * 32 + 16); }
+                    else if( this.lastMoveRight){ this.sprite.setX(this.lastKnowAllowedCoordinate.x * 32 + 16); }
+                    else { this.sprite.setY(this.lastKnowAllowedCoordinate.y * 32 +16 ); }
+                }
 			}
 		}
 	}
