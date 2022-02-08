@@ -10,6 +10,7 @@ export default class BaseMenu {
     protected DOWN: sprite = { name: 'stop', spriteBody: undefined, xPosition: 24, yPosition:12 };
     protected RIGHT: sprite = { name: 'items', spriteBody: undefined, xPosition: 48, yPosition:0 };
     protected TEXTBOX: TextBox;
+    protected selectedOption: string = '';
 
     protected scene!: Phaser.Scene;
 
@@ -21,15 +22,13 @@ export default class BaseMenu {
         this.TEXTBOX = new TextBox(scene);
     }
 
-    public toggleMenu(condition: boolean){
-        if(condition) {
+    public toggleMenu(display: boolean){
+        if(display) {
             this.createMenu(this.UP);
             this.createMenu(this.LEFT);
             this.createMenu(this.RIGHT);
-            this.createMenu(this.DOWN);
-            
-        }
-        else {
+            this.createMenu(this.DOWN);   
+        } else {
             this.UP.spriteBody?.destroy();
             this.LEFT.spriteBody?.destroy();
             this.RIGHT.spriteBody?.destroy();
@@ -62,15 +61,19 @@ export default class BaseMenu {
         if(anim == this.UP.name){ 
             this.addTextBox(this.UP.name);
             this.UP.spriteBody!.play(this.UP.name); 
+            this.selectedOption = this.UP.name;
         } else if(anim == this.LEFT.name){ 
             this.addTextBox(this.LEFT.name);
             this.LEFT.spriteBody!.play(this.LEFT.name); 
+            this.selectedOption = this.LEFT.name;
         } else if(anim == this.DOWN.name){ 
             this.addTextBox(this.DOWN.name);
             this.DOWN.spriteBody!.play(this.DOWN.name); 
+            this.selectedOption = this.DOWN.name;
         }  else if(anim == this.RIGHT.name){ 
             this.addTextBox(this.RIGHT.name);
-            this.RIGHT.spriteBody!.play(this.RIGHT.name); 
+            this.RIGHT.spriteBody!.play(this.RIGHT.name);
+            this.selectedOption = this.RIGHT.name;
         }
     }
 

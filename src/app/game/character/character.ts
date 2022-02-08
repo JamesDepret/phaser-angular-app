@@ -16,6 +16,7 @@ export default class Character  {
     private _canFly : boolean;
     private _currentMap: Phaser.Tilemaps.TilemapLayer;
     private _currentCoordinate : Coordinate;
+    public queueNumber: number;
     private movableCoordinates: Coordinate[] = [];
      
 
@@ -24,7 +25,7 @@ export default class Character  {
     private movementRects: Phaser.GameObjects.Graphics[] = [];
 
 
-    constructor(scene: Phaser.Scene, name: string, xPos: number, yPos: number, hp: number,  speed: number, damage: number, currentMap: Phaser.Tilemaps.TilemapLayer, canFly: boolean = false) {
+    constructor(scene: Phaser.Scene, name: string, xPos: number, yPos: number, hp: number,  speed: number, damage: number, currentMap: Phaser.Tilemaps.TilemapLayer, queueNumber: number,canFly: boolean = false) {
         this.scene = scene;
         this._hp = hp;
         this._speed = speed;
@@ -33,21 +34,23 @@ export default class Character  {
         this._currentYPosition = yPos;
         this._currentHp = hp;
         this._name = name;
+        this.queueNumber = queueNumber;
         this._canFly = canFly;
         
-		this.combatMenu = new CombatMenu(scene);
+		this.combatMenu = new CombatMenu(scene, this.queueNumber);
         this._currentCoordinate = {x: (xPos + 16) /32 - 1, y: (yPos + 16)/32 - 1} ;
         this.lastKnowAllowedCoordinate = this._currentCoordinate;
 		this._sprite = createCharacter(scene, name, xPos, yPos);
         this._currentMap = currentMap;
-        //this.calculateMovableCoordinates()
+        this.calculateMovableCoordinates()
     }
 
     
     calculateMovableCoordinates(){
         this.movableCoordinates = [{x: this.currentCoordinate.x, y: this.currentCoordinate.y, remainingSpeed: this.speed}];
+        console.log(this.name +":" + Date.now());
         if(this.speed > 0) this.recursiveCoordinate(this.speed,this.currentCoordinate.x,this.currentCoordinate.y);
-        console.log(this.movableCoordinates);
+        console.log(this.name +":" + Date.now() + " - " + this.movableCoordinates.length + " - " + this.count);
     }
 
     private recursiveCoordinate(remainingSpeed: number, x: number, y: number){
@@ -57,7 +60,9 @@ export default class Character  {
         this.validateCoordinate(x, y - 1, remainingSpeed);
     }
     num: number = 0;
+    count: number = 0
     private validateCoordinate(x: number, y: number, remainingSpeed: number) {
+        this.count++;
         let newTile: Phaser.Tilemaps.Tile = this.currentMap.getTileAt(x, y);
         let tileInList = this.movableCoordinates.find(c => c.x == newTile.x && c.y == newTile.y);
         this.num++;
@@ -67,6 +72,7 @@ export default class Character  {
             } else {
                 tileInList.remainingSpeed = remainingSpeed;
             }
+            
             if(remainingSpeed - 1 > 0)
                 this.recursiveCoordinate(remainingSpeed - 1, x, y);
         }
