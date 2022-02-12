@@ -2,6 +2,8 @@
 import { createCharacter } from "src/app/utils/character";
 import { Coordinate } from "src/app/utils/coordinate";
 import CombatMenu from "../menu/combat_menu";
+import MovementArea from "./movement/movement-area";
+import MovementDisplay from "./movement/movement-display";
 
 export default class Character {
     private scene: Phaser.Scene;
@@ -19,12 +21,11 @@ export default class Character {
     public queueNumber: number;
     private movableCoordinates: Coordinate[] = [];
     private endTurn: boolean = false;
-
-
     private SPRITESPEED: number = 200;
-    private combatMenu!: CombatMenu;
-    private movementRects: Phaser.GameObjects.Graphics[] = [];
 
+    private combatMenu!: CombatMenu;
+    private movementArea: MovementArea;
+    private movementDisplay: MovementDisplay;
 
     constructor(scene: Phaser.Scene, name: string, xPos: number, yPos: number, hp: number, speed: number, damage: number, currentMap: Phaser.Tilemaps.TilemapLayer, queueNumber: number, canFly: boolean = false) {
         this.scene = scene;
@@ -43,44 +44,11 @@ export default class Character {
         this.lastKnowAllowedCoordinate = this._currentCoordinate;
         this._sprite = createCharacter(scene, name, xPos, yPos);
         this._currentMap = currentMap;
+        this.movementArea = new MovementArea(this._currentMap);
+        this.movementDisplay = new MovementDisplay(this.scene);
     }
 
-
-    calculateMovableCoordinates() {
-        this.movableCoordinates = [{ x: this.currentCoordinate.x, y: this.currentCoordinate.y, remainingSpeed: this.speed }];
-        if (this.speed > 0) this.recursiveCoordinate(this.speed, this.currentCoordinate.x, this.currentCoordinate.y);
-    }
-
-    private recursiveCoordinate(remainingSpeed: number, x: number, y: number) {
-        this.validateCoordinate(x + 1, y, remainingSpeed);
-        this.validateCoordinate(x - 1, y, remainingSpeed);
-        this.validateCoordinate(x, y + 1, remainingSpeed);
-        this.validateCoordinate(x, y - 1, remainingSpeed);
-    }
-    num: number = 0;
-    count: number = 0
-    private validateCoordinate(x: number, y: number, remainingSpeed: number) {
-        this.count++;
-        let newTile: Phaser.Tilemaps.Tile = this.currentMap.getTileAt(x, y);
-        let tileInList = this.movableCoordinates.find(c => c.x == newTile.x && c.y == newTile.y);
-        this.num++;
-        if (newTile && !newTile.canCollide && (remainingSpeed >= tileInList?.remainingSpeed! || !tileInList)) {
-            if (!tileInList) {
-                this.movableCoordinates.push({ x: x, y, remainingSpeed });
-            } else {
-                tileInList.remainingSpeed = remainingSpeed;
-            }
-
-            if (remainingSpeed - 1 > 0)
-                this.recursiveCoordinate(remainingSpeed - 1, x, y);
-        }
-    }
-
-    public addColiders(colliderObj: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[] | Phaser.GameObjects.Group | Phaser.GameObjects.Group[]) {
-        this.scene.physics.add.collider(this.sprite, colliderObj);
-    }
-
-
+    //#region properties
     public get currentCoordinate(): Coordinate {
         return this._currentCoordinate;
     }
@@ -95,14 +63,12 @@ export default class Character {
         this._currentMap = v;
     }
 
-
     public get canFly(): boolean {
         return this._canFly;
     }
     public set canFly(v: boolean) {
         this._canFly = v;
     }
-
 
     public get name(): string {
         return this._name;
@@ -132,14 +98,12 @@ export default class Character {
         this._hp = v;
     }
 
-
     public get damage(): number {
         return this._damage;
     }
     public set damage(v: number) {
         this._damage = v;
     }
-
 
     public get currentXPosition(): number {
         return this._currentXPosition;
@@ -161,60 +125,16 @@ export default class Character {
     public set currentHp(v: number) {
         this._currentHp = v;
     }
+//#endregion properties
 
-    private removeRectsTimeStamp: Date | null = null;
-    private addRectsTimeStamp: Date | null = null;
-    private startMovementAnimation: boolean = false;
-    private movementDisplayed: boolean = false;
-    public displayMovementArea(state: boolean) {
-        if (state) {
-            if (!this.startMovementAnimation) {
-                this.startMovementAnimation = true;
-                this.movementDisplayed = true;
-                this.addRectsTimeStamp = new Date();
-            }
-            this.movementAnimation();
-
-        } else {
-            this.startMovementAnimation = false;
-            this.movementRects.forEach(r => r.destroy());
-            this.movementRects = [];
-            this.movementDisplayed = false;
-        }
+    public addColiders(colliderObj: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[] | Phaser.GameObjects.Group | Phaser.GameObjects.Group[]) {
+        this.scene.physics.add.collider(this.sprite, colliderObj);
     }
-    private movementAnimation() {
-        let timeoutTime = 400;
-        if (this.movementDisplayed) {
-            if (this.addRectsTimeStamp && new Date(Date.now()) > this.addRectsTimeStamp) {
-                this.drawMovement();
-                this.addRectsTimeStamp = null;
-                this.removeRectsTimeStamp = new Date(Date.now() + timeoutTime);
-
-            } else if (this.removeRectsTimeStamp && new Date(Date.now()) > this.removeRectsTimeStamp) {
-                this.movementRects.forEach(r => r.destroy());
-                this.movementRects = [];
-                this.removeRectsTimeStamp = null;
-                this.addRectsTimeStamp = new Date(Date.now() + timeoutTime);
-
-            }
-        }
+    private calculateMovableCoordinates() {
+        this.movableCoordinates = this.movementArea.calculateMovableCoordinates(this.currentCoordinate, this.speed);
+        this.movementDisplay.movableCoordinates = this.movableCoordinates;
     }
 
-    private drawMovement() {
-        let graphics: Phaser.GameObjects.Graphics = this.createNewGraphic();
-        graphics.fillStyle(0x000000, 0.4);
-        this.movableCoordinates.forEach(c => {
-            this.movementRects.push(graphics.fillRect(c.x * 32, c.y * 32, 32, 32));
-        })
-    }
-
-    private createNewGraphic(): Phaser.GameObjects.Graphics {
-        return this.scene.make.graphics({
-            x: 0,
-            y: 0,
-            add: true
-        });
-    }
 
     public setEndTurn(state: boolean) {
         if (state) {
@@ -226,6 +146,14 @@ export default class Character {
         this.endTurn = state;
         this.combatMenu.setEndTurn(state);
     }
+
+    
+    //-------------------------------------------------------------------------------- REFACTOR --------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------- REFACTOR --------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------- REFACTOR --------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------- REFACTOR --------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------- REFACTOR --------------------------------------------------------------------------------
+    
 
     private MenuOpened: boolean = false;
     private lastMoveUp: boolean = false;
@@ -241,9 +169,9 @@ export default class Character {
 
             if (this.MenuOpened) {
                 this.combatMenu.cursorInput(cursors);
-                this.displayMovementArea(false);
+                this.movementDisplay.displayMovementArea(false);
             } else {
-                this.displayMovementArea(true);
+                this.movementDisplay.displayMovementArea(true);
                 let xPos = this.round32(this.sprite.x + 16);
                 let yPos = this.round32(this.sprite.y + 16);
 
@@ -338,6 +266,11 @@ export default class Character {
         }
     }
 
+
+    round32(value: number): number {
+        return 32 * (Math.round(value / 32));
+    }
+
     private handleSpaceBar(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
         if (cursors.space?.isDown && this.spaceDown == false) {
             this.spaceDown = true;
@@ -349,8 +282,5 @@ export default class Character {
         }
     }
 
-    round32(value: number): number {
-        return 32 * (Math.round(value / 32));
-    }
 
 }
