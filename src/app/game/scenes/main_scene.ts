@@ -1,9 +1,7 @@
 import Phaser from 'phaser';
-import { createCharacter } from 'src/app/utils/character';
 import { ENDTURN } from 'src/app/utils/constants';
 import { debugHelperDisplayWalls } from 'src/app/utils/debug';
 import Character from '../character/character';
-import CombatMenu from '../menu/combat_menu';
 
 export class MainScene extends Phaser.Scene {
 	private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -32,6 +30,7 @@ export class MainScene extends Phaser.Scene {
 		this.events.on(ENDTURN, this.endTurn, this);
 		this.characterQueue.sort((a,b) => a.queueNumber - b.queueNumber);
 		this.activeChar = this.characterQueue[0];
+		this.activeChar.setEndTurn(false);
     }
 	
     override update() {
@@ -41,15 +40,14 @@ export class MainScene extends Phaser.Scene {
 		this.activeChar.setCursorValidation(this.cursors);
     }
 
-//#region PRIVATE FUNCTIONS
+	//#region PRIVATE FUNCTIONS
 	private endTurn(queueNumber: number){
 		if(this.activeChar.queueNumber == queueNumber){
+			this.activeChar.setEndTurn(true);
 			let index = this.characterQueue.indexOf(this.activeChar);
 			index = index + 1 >= this.characterQueue.length ? 0 : index + 1;
-			console.log('index char: ' + index)
 			this.activeChar = this.characterQueue[ index];
-			console.log(this.activeChar.name);
-			console.log(this.characterQueue);
+			this.activeChar.setEndTurn(false);
 		}
 	}
 

@@ -3,6 +3,7 @@ import BaseMenu from "./base_menu";
 
 export default class CombatMenu extends BaseMenu {
     queueNumber: number;
+    endTurn: boolean = false;
     constructor(scene: Phaser.Scene, queueNumber: number) {
         super(scene);
         this.scene = scene;
@@ -27,12 +28,18 @@ export default class CombatMenu extends BaseMenu {
         }
     }
     public override cursorInput(cursor: Phaser.Types.Input.Keyboard.CursorKeys) {
-        super.cursorInput(cursor);
-        if(cursor.shift?.isDown){
-            if(this.DOWN.name == this.selectedOption){
-                this.scene.events.emit(ENDTURN, this.queueNumber);   
-                this.toggleMenu(false);
+        if(!this.endTurn){
+            super.cursorInput(cursor);
+            if(cursor.shift?.isDown){
+                if(this.DOWN.name == this.selectedOption){
+                    this.scene.events.emit(ENDTURN, this.queueNumber);
+                    this.setEndTurn(true);   
+                    this.toggleMenu(false);
+                }
             }
         }
+    }
+    public setEndTurn(state: boolean){
+        this.endTurn = state;
     }
 }

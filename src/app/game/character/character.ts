@@ -3,29 +3,30 @@ import { createCharacter } from "src/app/utils/character";
 import { Coordinate } from "src/app/utils/coordinate";
 import CombatMenu from "../menu/combat_menu";
 
-export default class Character  {
+export default class Character {
     private scene: Phaser.Scene;
-    private _speed : number;
-    private _sprite : Phaser.Physics.Arcade.Sprite;
-    private _hp : number;
-    private _damage : number;
-    private _currentYPosition : number;
-    private _currentXPosition : number;
-    private _currentHp : number;
-    private _name : string;
-    private _canFly : boolean;
+    private _speed: number;
+    private _sprite: Phaser.Physics.Arcade.Sprite;
+    private _hp: number;
+    private _damage: number;
+    private _currentYPosition: number;
+    private _currentXPosition: number;
+    private _currentHp: number;
+    private _name: string;
+    private _canFly: boolean;
     private _currentMap: Phaser.Tilemaps.TilemapLayer;
-    private _currentCoordinate : Coordinate;
+    private _currentCoordinate: Coordinate;
     public queueNumber: number;
     private movableCoordinates: Coordinate[] = [];
-     
+    private endTurn: boolean = false;
 
-	private SPRITESPEED: number = 200;
-	private combatMenu!: CombatMenu;
+
+    private SPRITESPEED: number = 200;
+    private combatMenu!: CombatMenu;
     private movementRects: Phaser.GameObjects.Graphics[] = [];
 
 
-    constructor(scene: Phaser.Scene, name: string, xPos: number, yPos: number, hp: number,  speed: number, damage: number, currentMap: Phaser.Tilemaps.TilemapLayer, queueNumber: number,canFly: boolean = false) {
+    constructor(scene: Phaser.Scene, name: string, xPos: number, yPos: number, hp: number, speed: number, damage: number, currentMap: Phaser.Tilemaps.TilemapLayer, queueNumber: number, canFly: boolean = false) {
         this.scene = scene;
         this._hp = hp;
         this._speed = speed;
@@ -36,24 +37,21 @@ export default class Character  {
         this._name = name;
         this.queueNumber = queueNumber;
         this._canFly = canFly;
-        
-		this.combatMenu = new CombatMenu(scene, this.queueNumber);
-        this._currentCoordinate = {x: (xPos + 16) /32 - 1, y: (yPos + 16)/32 - 1} ;
+
+        this.combatMenu = new CombatMenu(scene, this.queueNumber);
+        this._currentCoordinate = { x: (xPos + 16) / 32 - 1, y: (yPos + 16) / 32 - 1 };
         this.lastKnowAllowedCoordinate = this._currentCoordinate;
-		this._sprite = createCharacter(scene, name, xPos, yPos);
+        this._sprite = createCharacter(scene, name, xPos, yPos);
         this._currentMap = currentMap;
-        this.calculateMovableCoordinates()
     }
 
-    
-    calculateMovableCoordinates(){
-        this.movableCoordinates = [{x: this.currentCoordinate.x, y: this.currentCoordinate.y, remainingSpeed: this.speed}];
-        console.log(this.name +":" + Date.now());
-        if(this.speed > 0) this.recursiveCoordinate(this.speed,this.currentCoordinate.x,this.currentCoordinate.y);
-        console.log(this.name +":" + Date.now() + " - " + this.movableCoordinates.length + " - " + this.count);
+
+    calculateMovableCoordinates() {
+        this.movableCoordinates = [{ x: this.currentCoordinate.x, y: this.currentCoordinate.y, remainingSpeed: this.speed }];
+        if (this.speed > 0) this.recursiveCoordinate(this.speed, this.currentCoordinate.x, this.currentCoordinate.y);
     }
 
-    private recursiveCoordinate(remainingSpeed: number, x: number, y: number){
+    private recursiveCoordinate(remainingSpeed: number, x: number, y: number) {
         this.validateCoordinate(x + 1, y, remainingSpeed);
         this.validateCoordinate(x - 1, y, remainingSpeed);
         this.validateCoordinate(x, y + 1, remainingSpeed);
@@ -67,110 +65,110 @@ export default class Character  {
         let tileInList = this.movableCoordinates.find(c => c.x == newTile.x && c.y == newTile.y);
         this.num++;
         if (newTile && !newTile.canCollide && (remainingSpeed >= tileInList?.remainingSpeed! || !tileInList)) {
-            if(!tileInList) {
-                this.movableCoordinates.push({ x: x, y , remainingSpeed });
+            if (!tileInList) {
+                this.movableCoordinates.push({ x: x, y, remainingSpeed });
             } else {
                 tileInList.remainingSpeed = remainingSpeed;
             }
-            
-            if(remainingSpeed - 1 > 0)
+
+            if (remainingSpeed - 1 > 0)
                 this.recursiveCoordinate(remainingSpeed - 1, x, y);
         }
     }
 
-    public addColiders(colliderObj: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[] | Phaser.GameObjects.Group | Phaser.GameObjects.Group[]){
-		this.scene.physics.add.collider(this.sprite, colliderObj);
+    public addColiders(colliderObj: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[] | Phaser.GameObjects.Group | Phaser.GameObjects.Group[]) {
+        this.scene.physics.add.collider(this.sprite, colliderObj);
     }
-    
-    
-    public get currentCoordinate() : Coordinate {
+
+
+    public get currentCoordinate(): Coordinate {
         return this._currentCoordinate;
     }
-    public set currentCoordinate(v : Coordinate) {
+    public set currentCoordinate(v: Coordinate) {
         this._currentCoordinate = v;
     }
 
-    public get currentMap() : Phaser.Tilemaps.TilemapLayer {
+    public get currentMap(): Phaser.Tilemaps.TilemapLayer {
         return this._currentMap;
     }
-    public set currentMap(v : Phaser.Tilemaps.TilemapLayer) {
+    public set currentMap(v: Phaser.Tilemaps.TilemapLayer) {
         this._currentMap = v;
     }
-    
 
-    public get canFly() : boolean {
+
+    public get canFly(): boolean {
         return this._canFly;
     }
-    public set canFly(v : boolean) {
+    public set canFly(v: boolean) {
         this._canFly = v;
     }
-    
 
-    public get name() : string {
+
+    public get name(): string {
         return this._name;
     }
-    public set name(v : string) {
+    public set name(v: string) {
         this._name = v;
     }
-    
-    public get speed() : number {
+
+    public get speed(): number {
         return this._speed;
     }
-    public set speed(v : number) {
+    public set speed(v: number) {
         this._speed = v;
     }
-    
-    public get sprite() : Phaser.Physics.Arcade.Sprite {
+
+    public get sprite(): Phaser.Physics.Arcade.Sprite {
         return this._sprite;
     }
-    public set sprite(v : Phaser.Physics.Arcade.Sprite) {
+    public set sprite(v: Phaser.Physics.Arcade.Sprite) {
         this._sprite = v;
     }
-    
-    public get hp() : number {
+
+    public get hp(): number {
         return this._hp;
     }
-    public set hp(v : number) {
+    public set hp(v: number) {
         this._hp = v;
     }
 
-    
-    public get damage() : number {
+
+    public get damage(): number {
         return this._damage;
     }
-    public set damage(v : number) {
+    public set damage(v: number) {
         this._damage = v;
     }
-    
-    
-    public get currentXPosition() : number {
+
+
+    public get currentXPosition(): number {
         return this._currentXPosition;
     }
-    public set currentXPosition(v : number) {
+    public set currentXPosition(v: number) {
         this._currentXPosition = v;
     }
-    
-    public get currentYPosition() : number {
+
+    public get currentYPosition(): number {
         return this._currentYPosition;
     }
-    public set currentYPosition(v : number) {
+    public set currentYPosition(v: number) {
         this._currentYPosition = v;
     }
 
-    public get currentHp() : number {
+    public get currentHp(): number {
         return this._currentHp;
     }
-    public set currentHp(v : number) {
+    public set currentHp(v: number) {
         this._currentHp = v;
     }
-    
+
     private removeRectsTimeStamp: Date | null = null;
     private addRectsTimeStamp: Date | null = null;
     private startMovementAnimation: boolean = false;
     private movementDisplayed: boolean = false;
-    public movement(state: boolean){
-        if(state){
-            if(!this.startMovementAnimation){
+    public displayMovementArea(state: boolean) {
+        if (state) {
+            if (!this.startMovementAnimation) {
                 this.startMovementAnimation = true;
                 this.movementDisplayed = true;
                 this.addRectsTimeStamp = new Date();
@@ -186,7 +184,7 @@ export default class Character  {
     }
     private movementAnimation() {
         let timeoutTime = 400;
-        if(this.movementDisplayed){
+        if (this.movementDisplayed) {
             if (this.addRectsTimeStamp && new Date(Date.now()) > this.addRectsTimeStamp) {
                 this.drawMovement();
                 this.addRectsTimeStamp = null;
@@ -206,8 +204,8 @@ export default class Character  {
         let graphics: Phaser.GameObjects.Graphics = this.createNewGraphic();
         graphics.fillStyle(0x000000, 0.4);
         this.movableCoordinates.forEach(c => {
-            this.movementRects.push(graphics.fillRect(c.x * 32, c.y * 32, 32, 32)); 
-        })   
+            this.movementRects.push(graphics.fillRect(c.x * 32, c.y * 32, 32, 32));
+        })
     }
 
     private createNewGraphic(): Phaser.GameObjects.Graphics {
@@ -218,80 +216,92 @@ export default class Character  {
         });
     }
 
-    
-    
-	private MenuOpened: boolean = false;
-	private lastMoveUp: boolean = false;
+    public setEndTurn(state: boolean) {
+        if (state) {
+            this.MenuOpened = false;
+            this.currentCoordinate = this.lastKnowAllowedCoordinate;
+        } else {
+            this.calculateMovableCoordinates()
+        }
+        this.endTurn = state;
+        this.combatMenu.setEndTurn(state);
+    }
+
+    private MenuOpened: boolean = false;
+    private lastMoveUp: boolean = false;
     private lastMoveLeft: boolean = false;
     private lastMoveRight: boolean = false;
     private lastMoveDown: boolean = false;
-	private spaceDown: boolean = false;
+    private spaceDown: boolean = false;
     private lastKnowAllowedCoordinate: Coordinate;
-    private urdlCoordinates: (Coordinate | null)[]=[null,null,null,null]
-	public setCursorValidation(cursors: Phaser.Types.Input.Keyboard.CursorKeys ){   
-        this.handleSpaceBar(cursors);
+    private urdlCoordinates: (Coordinate | null)[] = [null, null, null, null]
+    public setCursorValidation(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
+        if (!this.endTurn) {
+            this.handleSpaceBar(cursors);
 
-		if(this.MenuOpened){
-			this.combatMenu.cursorInput(cursors);
-            this.movement(false);
-		} else {
-            this.movement(true);
-            let xPos = this.round32(this.sprite.x +16);
-            let yPos = this.round32(this.sprite.y + 16);
-            
-            let xCoord = (xPos + 16)/32 - 1.5;
-            let yCoord = (yPos + 16)/32 - 1.5;
+            if (this.MenuOpened) {
+                this.combatMenu.cursorInput(cursors);
+                this.displayMovementArea(false);
+            } else {
+                this.displayMovementArea(true);
+                let xPos = this.round32(this.sprite.x + 16);
+                let yPos = this.round32(this.sprite.y + 16);
 
-            let CoordinateInList = this.movableCoordinates.find(c => c.x == xCoord && c.y == yCoord );
-            if(CoordinateInList) this.lastKnowAllowedCoordinate = CoordinateInList;
+                let xCoord = (xPos + 16) / 32 - 1.5;
+                let yCoord = (yPos + 16) / 32 - 1.5;
 
-			if(cursors.left?.isDown && CoordinateInList){
-                if(this.urdlCoordinates[3] == null && !this.lastMoveLeft || this.lastMoveLeft && this.urdlCoordinates[3] != null) {
-                    this.urdlCoordinates = [null,null,null,this.movableCoordinates.find(c => c.x ==xCoord - 1 && c.y ==yCoord) ?? null];
+                let CoordinateInList = this.movableCoordinates.find(c => c.x == xCoord && c.y == yCoord);
+                if (CoordinateInList) this.lastKnowAllowedCoordinate = CoordinateInList;
+
+                if (cursors.left?.isDown && CoordinateInList) {
+                    if (this.urdlCoordinates[3] == null && !this.lastMoveLeft || this.lastMoveLeft && this.urdlCoordinates[3] != null) {
+                        this.urdlCoordinates = [null, null, null, this.movableCoordinates.find(c => c.x == xCoord - 1 && c.y == yCoord) ?? null];
+                    }
+
+                    this.setDirection(false, false, false, true);
+                    if (this.urdlCoordinates[3]) {
+                        this.sprite.setVelocity(-this.SPRITESPEED, 0);
+                        this.sprite.anims.play(this.name + '-look-left', true);
+                    }
                 }
-                
-                this.setDirection(false, false, false, true);
-                if(this.urdlCoordinates[3]){
-                    this.sprite.setVelocity(-this.SPRITESPEED,0);
-                    this.sprite.anims.play(this.name + '-look-left', true);
+                else if (cursors.right?.isDown && CoordinateInList) {
+                    if (this.urdlCoordinates[1] == null && !this.lastMoveRight || this.urdlCoordinates[1] != null && this.lastMoveRight) {
+                        this.urdlCoordinates = [null, this.movableCoordinates.find(c => c.x == xCoord + 1 && c.y == yCoord) ?? null, null, null];
+                    }
+
+                    this.setDirection(false, true, false, false);
+                    if (this.urdlCoordinates[1]) {
+                        this.sprite.setVelocity(this.SPRITESPEED, 0);
+                        this.sprite.anims.play(this.name + '-look-right', true);
+                    }
                 }
-			} 
-			else if (cursors.right?.isDown && CoordinateInList) {
-                if(this.urdlCoordinates[1] == null && !this.lastMoveRight || this.urdlCoordinates[1] != null && this.lastMoveRight) {
-                    this.urdlCoordinates = [null,this.movableCoordinates.find(c => c.x == xCoord + 1 && c.y ==yCoord) ?? null, null,null];
-                }                
-                
-                this.setDirection(false, true, false, false);
-                if(this.urdlCoordinates[1]){
-                    this.sprite.setVelocity(this.SPRITESPEED, 0);
-                    this.sprite.anims.play(this.name + '-look-right', true);
+                else if (cursors.down?.isDown && CoordinateInList) {
+                    if (this.urdlCoordinates[2] == null && !this.lastMoveDown || this.urdlCoordinates[2] != null && this.lastMoveDown) {
+                        this.urdlCoordinates = [null, null, this.movableCoordinates.find(c => c.x == xCoord && c.y == yCoord + 1) ?? null, null];
+                    }
+                    this.setDirection(false, false, true, false);
+                    if (this.urdlCoordinates[2]) {
+                        this.sprite.setVelocity(0, this.SPRITESPEED);
+                        this.sprite.anims.play(this.name + '-look-down', true);
+                    }
                 }
-			} 
-			else if(cursors.down?.isDown && CoordinateInList){
-                if(this.urdlCoordinates[2] == null && !this.lastMoveDown || this.urdlCoordinates[2] != null && this.lastMoveDown) {
-                    this.urdlCoordinates = [null,null,this.movableCoordinates.find(c => c.x == xCoord && c.y == yCoord+1) ?? null,null];
+                else if (cursors.up?.isDown && CoordinateInList) {
+                    console.log("here");
+                    if (this.urdlCoordinates[0] == null && !this.lastMoveUp || this.urdlCoordinates[0] != null && this.lastMoveUp) {
+                        this.urdlCoordinates = [this.movableCoordinates.find(c => c.x == xCoord && c.y == yCoord - 1) ?? null, null, null, null];
+                    }
+
+                    this.setDirection(true, false, false, false);
+                    if (this.urdlCoordinates[0]) {
+                        this.sprite.setVelocity(0, -this.SPRITESPEED);
+                        this.sprite.anims.play(this.name + '-look-up', true);
+                    }
+                } else {
+                    this.correctPosition();
                 }
-                this.setDirection(false, false, true, false);
-                if(this.urdlCoordinates[2]){
-                    this.sprite.setVelocity(0,this.SPRITESPEED);
-                    this.sprite.anims.play(this.name + '-look-down', true);
-                }
-			} 
-			else if (cursors.up?.isDown && CoordinateInList) {      
-                if(this.urdlCoordinates[0] == null && !this.lastMoveUp || this.urdlCoordinates[0] != null && this.lastMoveUp) {
-                    this.urdlCoordinates = [this.movableCoordinates.find(c => c.x == xCoord && c.y == yCoord-1) ?? null,null,null,null];
-                }
-                          
-                this.setDirection(true, false, false, false);
-                if(this.urdlCoordinates[0]){
-                    this.sprite.setVelocity(0, -this.SPRITESPEED);
-                    this.sprite.anims.play(this.name + '-look-up', true);
-                }
-			} else {
-                this.correctPosition();
-			}
-		}
-	}
+            }
+        }
+    }
 
     private setDirection(up: boolean, right: boolean, down: boolean, left: boolean) {
         this.lastMoveUp = up;
@@ -339,8 +349,8 @@ export default class Character  {
         }
     }
 
-	round32(value: number): number{
-		return 32 * (Math.round(value / 32));
-	} 
+    round32(value: number): number {
+        return 32 * (Math.round(value / 32));
+    }
 
 }
