@@ -14,6 +14,7 @@ export default class MovementMoveChar {
     private _currentCoordinate: Coordinate;
     private nextSpritePosition: Coordinate | null = null;
     private _movableCoordinates: Coordinate[] = [];
+    private isMoving: boolean = false;
 
     constructor(SPRITESPEED: number, sprite: Phaser.Physics.Arcade.Sprite, charName: string, lastKnownAllowedCoordinate: Coordinate) {
         this.SPRITESPEED = SPRITESPEED;
@@ -21,23 +22,21 @@ export default class MovementMoveChar {
         this.name = charName;
         this._currentCoordinate = lastKnownAllowedCoordinate;
     }
-
+//#region Properties
     public get currentCoordinate(): Coordinate {
         return this._currentCoordinate;
     }
     public set currentCoordinate(v: Coordinate) {
         this._currentCoordinate = v;
     }
-
-
     public get movableCoordinates(): Coordinate[] {
         return this._movableCoordinates;
     }
     public set movableCoordinates(v: Coordinate[]) {
         this._movableCoordinates = v;
     }
-
-    private isMoving: boolean = false;
+//#endregion
+ 
     moveChar(cursors: Phaser.Types.Input.Keyboard.CursorKeys) {
         if (this.isMoving) {
             this.moveCharUntilNextTile();
@@ -49,9 +48,9 @@ export default class MovementMoveChar {
                 this.sprite.setX(this.nextSpritePosition!.x)
                 this.sprite.setY(this.nextSpritePosition!.y)
             }
+            
             this.cursorMovement(cursors);
         }
-
     }
 
     private moveCharUntilNextTile() {
