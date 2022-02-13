@@ -144,7 +144,7 @@ export default class Character {
     public setEndTurn(state: boolean) {
         if (state) {
             this.MenuOpened = false;
-            this.currentCoordinate = this.moveChar.lastKnownAllowedCoordinate;
+            this.currentCoordinate = this.moveChar.currentCoordinate;
         } else {
             this.calculateMovableCoordinates()
         }
