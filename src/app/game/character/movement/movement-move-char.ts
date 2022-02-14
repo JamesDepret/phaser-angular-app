@@ -29,9 +29,6 @@ export default class MovementMoveChar {
     public set currentCoordinate(v: Coordinate) {
         this._currentCoordinate = v;
     }
-    public get movableCoordinates(): Coordinate[] {
-        return this._movableCoordinates;
-    }
     public set movableCoordinates(v: Coordinate[]) {
         this._movableCoordinates = v;
     }
@@ -82,7 +79,7 @@ export default class MovementMoveChar {
         let yCoord = (yPos + 16) / 32 - 1.5;
 
         if (cursors.left?.isDown) {
-            if (this.movableCoordinates.find(c => c.x == xCoord - 1 && c.y == yCoord)) {
+            if (this._movableCoordinates.find(c => c.x == xCoord - 1 && c.y == yCoord)) {
                 this.sprite.anims.play(this.name + '-look-left', true);
                 this.nextSpritePosition = { x: this.sprite.x - 32, y: this.sprite.y };
                 this.isMoving = true;
@@ -91,7 +88,7 @@ export default class MovementMoveChar {
             }
         }
         else if (cursors.right?.isDown) {
-            if (this.movableCoordinates.find(c => c.x == xCoord + 1 && c.y == yCoord)) {
+            if (this._movableCoordinates.find(c => c.x == xCoord + 1 && c.y == yCoord)) {
                 this.sprite.anims.play(this.name + '-look-right', true);
                 this.nextSpritePosition = { x: this.sprite.x + 32, y: this.sprite.y };
                 this.isMoving = true;
@@ -100,7 +97,7 @@ export default class MovementMoveChar {
             }
         }
         else if (cursors.down?.isDown) {
-            if (this.movableCoordinates.find(c => c.x == xCoord && c.y == yCoord + 1)) {
+            if (this._movableCoordinates.find(c => c.x == xCoord && c.y == yCoord + 1)) {
                 this.sprite.setVelocity(0, this.SPRITESPEED);
                 this.sprite.anims.play(this.name + '-look-down', true);
                 this.nextSpritePosition = { x: this.sprite.x, y: this.sprite.y + 32 };
@@ -109,7 +106,7 @@ export default class MovementMoveChar {
             }
         }
         else if (cursors.up?.isDown) {
-            if (this.movableCoordinates.find(c => c.x == xCoord && c.y == yCoord - 1)) {
+            if (this._movableCoordinates.find(c => c.x == xCoord && c.y == yCoord - 1)) {
                 this.sprite.setVelocity(0, -this.SPRITESPEED);
                 this.sprite.anims.play(this.name + '-look-up', true);
                 this.nextSpritePosition = { x: this.sprite.x, y: this.sprite.y - 32 };

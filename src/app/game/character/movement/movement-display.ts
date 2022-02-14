@@ -11,17 +11,11 @@ export default class MovementDisplay {
     private movementRects: Phaser.GameObjects.Graphics[] = [];
     
     private _movableCoordinates : Coordinate[] = [];
-    public get movableCoordinates() : Coordinate[] {
-        return this._movableCoordinates;
-    }
     public set movableCoordinates(v : Coordinate[]) {
         this._movableCoordinates = v;
     }
     
     private _scene : Phaser.Scene;
-    public get scene() : Phaser.Scene {
-        return this._scene;
-    }
     public set scene(v : Phaser.Scene) {
         this._scene = v;
     }
@@ -65,13 +59,13 @@ export default class MovementDisplay {
     private drawMovement() {
         let graphics: Phaser.GameObjects.Graphics = this.createNewGraphic();
         graphics.fillStyle(0x000000, 0.4);
-        this.movableCoordinates.forEach(c => {
+        this._movableCoordinates.forEach(c => {
             this.movementRects.push(graphics.fillRect(c.x * 32, c.y * 32, 32, 32));
         })
     }
 
     private createNewGraphic(): Phaser.GameObjects.Graphics {
-        return this.scene.make.graphics({
+        return this._scene.make.graphics({
             x: 0,
             y: 0,
             add: true

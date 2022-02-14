@@ -12,9 +12,6 @@ export default class MovementArea {
     }
 
     //#region properties
-    public get currentMap() : Phaser.Tilemaps.TilemapLayer {
-        return this._currentMap;
-    }
     public set currentMap(v : Phaser.Tilemaps.TilemapLayer) {
         this._currentMap = v;
     }
@@ -34,7 +31,7 @@ export default class MovementArea {
     }
     
     private validateCoordinate(x: number, y: number, remainingSpeed: number) {
-        let newTile: Phaser.Tilemaps.Tile = this.currentMap.getTileAt(x, y);
+        let newTile: Phaser.Tilemaps.Tile = this._currentMap.getTileAt(x, y);
         let tileInList = this.movableCoordinates.find(c => c.x == newTile.x && c.y == newTile.y);
         if (newTile && !newTile.canCollide && (remainingSpeed >= tileInList?.remainingSpeed! || !tileInList)) {
             if (!tileInList) {
