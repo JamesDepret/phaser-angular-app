@@ -1,10 +1,9 @@
 import { Coordinate } from "src/app/utils/coordinate";
 
 /**
- * Class used to show the calculate the movable area of the character
+ * Class used to calculate the movable area of the character
  */
 export default class MovementArea {
-    private counter = 0;
     private remainingSpeed: number = 0;
     private currentSpeedCoordinates: Coordinate[] = [];
     private nextSpeedCoordinates: Coordinate[] = [];
@@ -22,7 +21,6 @@ export default class MovementArea {
     //#endregion properties
        
     calculateMovableCoordinates(currentCoordinate: Coordinate, speed: number): Coordinate[] {
-        
         this.getCoordinates(speed,currentCoordinate);
         return this.collectedCoordinates;
     }
@@ -45,7 +43,6 @@ export default class MovementArea {
     }
 
     private validateNextCoordinate(coord: Coordinate){
-        this.counter++;
         let newTile: Phaser.Tilemaps.Tile = this._currentMap.getTileAt(coord.x, coord.y);
         let tileInList = this.collectedCoordinates.find(c => c.x == coord.x && c.y == coord.y);
         if (newTile && !newTile.canCollide && !tileInList) {
